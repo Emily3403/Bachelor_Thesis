@@ -1,0 +1,80 @@
+use crate::constants::EXPECTED_BYTES;
+use crate::uart::uart::MiniUART;
+use log::error;
+use std::io::{stdout, Write};
+
+#[cfg(feature = "performance")]
+/// With the performance feature enabled, the following assumptions are made
+/// - A byte can always be read
+pub trait Reader {
+    fn read_byte(&mut self) -> u8;
+}
+
+#[cfg(feature = "performance")]
+impl Reader for MiniUART {
+    fn read_byte(&mut self) -> u8 {
+        self.regs.read_byte_unchecked()
+    }
+}
+
+#[cfg(not(feature = "performance"))]
+/// With safety checks enabled, the following assumptions are made
+/// - Reading a byte can fail because LSR == 1 → No data ready
+pub trait Reader {
+    fn has_overrun(&mut self) -> bool;
+    fn read_byte(&mut self) -> Option<u8>;
+}
+
+#[cfg(not(feature = "performance"))]
+impl Reader for MiniUART {
+    fn has_overrun(&mut self) -> bool {
+        self.regs.has_overrun()
+    }
+
+    fn read_byte(&mut self) -> Option<u8> {
+        if !self.regs.rx_byte_ready() {
+            error!("Tried to read byte while none is ready");
+            return None;
+        }
+
+        Some(self.regs.read_byte_unchecked())
+    }
+}
+
+#[cfg(not(feature = "performance"))]
+pub fn infinite_read(mut uart: MiniUART) -> ! {
+    let expected = EXPECTED_BYTES;
+    let expected_len = EXPECTED_BYTES.len();
+    let mut cur_index: usize = 0;
+    let mut errors: usize = 0;
+
+    loop {
+        uart.wait_for_byte();
+        let Some(c) = uart.read_byte() else {
+            continue;
+        };
+
+        if c == expected[cur_index] {
+            print!("{}", c as char);
+        } else {
+            println!(
+                "\nERROR: Incorrect char '{}', expected '{}'",
+                c as char, expected[cur_index] as char
+            );
+        }
+        errors += 1;
+        stdout().flush().unwrap();
+
+        cur_index += 1;
+        cur_index %= expected_len;
+    }
+}
+
+#[cfg(feature = "performance")]
+pub fn infinite_read(mut uart: MiniUART) -> ! {
+    loop {
+        uart.wait_for_byte();
+        // uart.read_byte();
+        print!("{}", uart.read_byte() as char);
+    }
+}

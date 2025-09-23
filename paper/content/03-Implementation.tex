@@ -1,0 +1,61 @@
+%&../template
+\documentclass[../main.tex]{subfiles}
+\usepackage{biblatex}
+\usepackage{tikz}
+
+\begin{document}
+
+    \clearpage  
+
+    \section{UART}
+    In this Thesis, we will primarily focus on the Mini-UART (\texttt{UART1}) found on the bcm2711 chip. This is because of two reasons: Firstly, it contains shallow FIFOs (8 bytes) that have to be read by the CPU and can't benefit from hardware acceleration or DMA. Secondly, it can run up to 32 MegaBaud.
+
+    There are a few limitations that come with the Mini-UART. The biggest one is the \todo[abysmal] Interrupt interface: There exists no way of acknowledging the interrupt without reading the data from the \texttt{IO} register: \enquote{the interrupt line is asserted whenever the receive FIFO holds at least 1 byte}. Luckily, the hardware provides a Scratch (\texttt{AUX\_MU\_SCRATCH}) register containing one byte of temporary storage.
+
+    This leaves us with two ways of passing the interrupt through to userspace: Disabling Interrupts generated from the hardware completely (through the \texttt{AUX\_MU\_IER\_REG} register) or reading the value and saving it in the temporary \texttt{AUX\_MU\_SCRATCH} register.
+
+    \subsection{Disabling Interrupts}
+    The following shows a flow graph of the interrupt handling
+    \begin{figure}[H]
+        \centering
+        \begin{tikzpicture}
+            \draw[draw=black] (0, 0) rectangle ++(1,1);
+        \end{tikzpicture}
+        \caption{Interrupt Handling when disabling Interrupts}
+        \label{fig:disable-interrupts}
+    \end{figure}
+
+    \subsection{Writing to the Scratch Register}
+    This approach is a lot more in line with the spirit of the UIO Framework: 
+    \enquote{If your hardware \textit{needs} some action to be performed after each interrupt, then you \textit{must} do it in your kernel module. Note that you cannot rely on the userspace part of your driver. Your userspace program can terminate at any time, possibly leaving your hardware in a state where proper interrupt handling is still required.}
+
+    As the only way of Acknowledging the interrupt in the hardware is reading from the IO register, reading it into the Scratch register is the best way to get around the limitations posed by the interrupt interface. On the other hand, this approach comes with the limitation that bytes may be missed if the userspace part of the driver isn't able to keep up. The kernel should be able to detect this and pause.
+
+    In order for us to be able to detect this, we also use the Scratch register and a nice \todo[Eigenheit] that comes with UART Transmission: The sent byte will never be \texttt{0}. Thus, in the userspace part of our driver we Acknowledge the byte by writing \texttt{0} into the Scratch register. In the kernel, we can then simply check if the Scratch register is \texttt{0} or not. If so, the userspace driver was able to handle the byte quickly enough and we can continue at this speed.
+
+    This provides a nice mechanism for the kernel to check if userspace is able to keep up and detect at which speeds userspace interrupt handling isn't anymore.
+
+
+    \clearpage
+
+    As we first step, we provide a reference implementation with polling. This is the baseline in terms of performance as the CPU speed will be the bottleneck for data throughput. Next, we want to investigate the improvements we will be able to achieve with interrupts, specifically IRQ. Finally, we provide a patch for the Linux Kernel enabling the use of FIQ in UIO. The differences in latency and throughput will be of great interest.
+
+    \subsection{Enabling the UART}
+
+    Adding the following lines to \texttt{/boot/firmware/config.txt} enables the mini-UART:
+\begin{verbatim}
+    enable_uart=1
+    core_freq=250
+\end{verbatim}
+
+    Additionally, the linux console has to be disabled with the \texttt{raspi-config} binary\href{https://www.raspberrypi.com/documentation/computers/configuration.html\#disabling-the-linux-serial-console}. \todo[Of course, the custom dtb has to be booted by the kernel to recognize the mini-uart as a uio device]
+
+    \subsection{Measurements}
+    - How to measure?
+
+    \subsection{Details}
+    Second Raspi
+
+    - NFS Booting
+
+\end{document}

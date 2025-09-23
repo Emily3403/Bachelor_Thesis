@@ -1,0 +1,57 @@
+%&../template
+\documentclass[../main.tex]{subfiles}
+
+\begin{document}
+
+    \clearpage
+    \section{Introduction}
+
+    In this thesis, we want to have a look at the standard kernel User I/O framework and how to integrate it with the FIQ Interrupt on the ARM Architecture. The FIQ Interrupt is of particular note as it is \enquote{reserved for a single, high-priority interrupt source that requires a guaranteed fast response time}\footnote{https://developer.arm.com/documentation/den0013/d/Exception-Handling/Exception-priorities/FIQ-and-IRQ}.
+
+    % Arguments:
+    %   - Higher Prio, won't be disabled
+    %   - Banked registers
+    %   - IVT entry at end → no branch
+    %   - Only one interrupt source, no need to figure out which device caused the interrupt
+
+    This property is achieved in two steps: Firstly, the FIQ interrupt has a higher priority than IRQ and won't be disabled when handling other exceptions: \enquote{All exceptions disable IRQ, only FIQ and reset disable FIQ}$^1$. Secondly, the ARM Architecture provides an additional 5 banked registers specific to the FIQ mode, allowing us to retain 40 bytes of memory across interrupts. Moreover, the FIQ entry in the Interrupt Vector Table (IVT) is the last one, making it possible to place the handler code directly afterward and skipping a branch instruction and the associated delay. With all these \todo[tricks], we are able to shave off precious processing time and decrease latency. In Chapter \todo, we will be measuring the concrete performance difference between FIQ and IRQ with the same driver code, just with swapped out interrupt implementations.
+
+    One important caveat of the FIQ is, that the handler is not able to generate executions such as a supervisor calls (SVC). This however integrates very nicely with the UIO framework, as \enquote{only a small kernel module is needed for handling the interrupt}, reducing the likelihood of needing any SVCs. Once the interrupt arrives in userspace, the ability to call SVCs is restored, so we won't be restricted by this limitation. Further, the FIQ interrupt is not typically used by Linux making it ideal to map the single interrupt source into userspace and increase performance for one specific userspace application.
+
+
+    \clearpage
+
+    With more and more drivers in the Linux Kernel switching to userland, we want to investigate how to improve performance with these drivers.
+
+    Writing drivers in userland has numerous advantages such as
+    \begin{itemize}
+        \item Wrong code won't crash the entire system
+        \item No kernel invariants can be messed with
+        \item Faster Debugging
+        \item Easier Devolopment
+    \end{itemize}
+
+    On the contrary however, these drivers also suffer from a few caveats introduced by not having the code run in kernel space:
+    \begin{itemize}
+        \item Performance overhead due to context switches
+        \item Memory Limitations
+        \item Userspace threads might be swapped out
+        \item During memory pressure, the kernel might decide to kill the userspace driver
+        \item Application restart: If the application is not given the opportunity to clean up or crashes, the device might be left in an inconsistent state
+    \end{itemize}
+
+    % Further Content:
+    %   - Warum Raspi 3b?
+    %
+    %   - IRQ Paper
+    % - Userspace can't get hardware interrupts directly → no routing directly to user-level applications. Maybe this is an assumption I could change with my kernel driver?
+    % - Userspace isn't integrated with scheduler
+    % - IRQs distort the processor pipeline quite significantly
+    % - Why doesn't DPDK use Interrupts instead of polling? Why is the overhead so high?
+    %
+    % Practical considerations
+    % - Interrupt Routing: which CPU core(s) handle my interrupts?
+
+
+
+\end{document}

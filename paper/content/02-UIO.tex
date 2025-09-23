@@ -1,0 +1,107 @@
+%&../template
+\documentclass[../main.tex]{subfiles}
+
+\begin{document}
+    \clearpage
+
+    \section{Linux UIO}
+    \begin{quote}
+        \it
+        For many types of devices, creating a Linux kernel driver is overkill. All that is really needed is some way to handle an interrupt and provide access to the memory space of the device. [...] Hardware that is ideally suited for an UIO driver fulfills all the following:
+
+        \begin{itemize}
+            \item The device has memory that can be mapped. The device can be controlled completely by writing to this memory.
+            \item The device usually generates interrupts.
+            \item The device does not fit into one of the standard kernel subsystems.
+        \end{itemize}
+    \end{quote}
+
+    This fits very well for our usecase, the Mini-UART of the Raspberry Pi 4b, in particular because the device \enquote{has shallow FIFOs, no DMA Support}, can be controlled via Memory-Mapped-IO, meaning a simple \texttt{mmap} will suffice and it generates interrupts.
+
+
+    \subsection{UIO Howto}
+
+    \enquote{Each UIO device is accessed through a device file (\texttt{/dev/uioX}) and several sysfs attribute files.} 
+    
+    \subsubsection{Accessing Memory}
+    \enquote{Each UIO device can make one or more memory regions available for memory mapping. Each mapping has its own directory in sysfs, the first mapping appears as \texttt{/sys/class/uio/uioX/maps/map0/}}
+
+    \enquote{Each \texttt{mapX/} directory contains four read-only files that show attributes of the memory:}
+    \begin{itemize}
+        \item \texttt{name}: A string identifier for this mapping.
+        \item \texttt{addr}: The address of memory that can be mapped.
+        \item \texttt{offset}: The size, in bytes, of the memory pointed to by addr.
+        \item \texttt{size}: The offset, in bytes, that has to be added to the pointer returned by mmap() to get to the actual device memory.
+    \end{itemize}
+
+    \enquote{From userspace, the different mappings are distinguished by adjusting the offset parameter of the mmap() call. To map the memory of mapping N, you have to use N times the page size as your offset}
+
+    \subsubsection{Handling Interrupts}
+    \enquote{Interrupts are handled by reading from /dev/uioX. A blocking read() from /dev/uioX will return as soon as an interrupt occurs. [...] The integer value read from /dev/uioX represents the total interrupt count}. This number should always be incrementing by 1.
+
+    \enquote{UIO also implements a write() function. It is normally not used [...]. A write to \texttt{/dev/uioX} will call the \texttt{irqcontrol()} function implemented by the driver.} Writing a \texttt{1} will enable interrupts and writing \texttt{0} will disable them.
+
+    \subsubsection{Inserting the UIO Module}
+    Inserting the UIO Kernel module is straightforward, however there are a few things that require attention. First, we have to modify the device tree (\texttt{arch/arm/boot/dts/broadcom/bcm2710-rpi-3-b.dts}), and add an additional entry in the top level scope and disable the UART:
+    \begin{verbatim}
+/ {
+    soc {
+        uio_uart: uio_uart@7e215040 {
+            compatible = "uio_uart";
+            reg = <0x7e215000 0x6c>;     // Mini UART registers (address + size)
+            interrupts = <1 29>;         // IRQ 29 with flags=1
+            interrupt-parent = <&intc>;  // Interrupt controller reference
+            status = "okay";
+        };
+    };
+};
+
+&uart0 {
+    ...
+    status = "disabled";
+};
+    \end{verbatim}
+
+    \newpage
+    Next, in our Kernel Module, we will have to specify the \texttt{compatible} string:
+
+    \begin{verbatim}
+static int uio_uart_probe(struct platform_device *pdev) {
+    printk(KERN_INFO "Hello World!");
+    TODO: This is not quite enough for /sys/class/uio/uio0 to appear...
+    return 0;
+};
+
+static struct of_device_id uio_uart_match[] = {
+    { .compatible = "uio_uart" },
+    { /* Sentinel */ },
+};
+
+static struct platform_driver uio_uart = {
+    .probe = uio_uart_probe,
+    .remove = uio_uart_remove,
+    .driver = {
+        .name = DRIVER_NAME,
+        .pm = &uio_uart_dev_pm_ops,
+        .of_match_table = of_match_ptr(uio_uart_match),
+    },
+};
+    \end{verbatim}
+
+    With this setup done, we can finally load the module with \texttt{sudo insmod uio\_uart.ko} and see the following output in \texttt{dmesg}
+
+\begin{verbatim}
+    ...
+    [ 1918.569519] Hello World!
+\end{verbatim}
+
+    The \texttt{struct uioinfo} tells the framework the details of our driver and is passed through\\\texttt{devm\_uio\_register\_device}.
+
+    For local state in the driver, the UIO framework provides the \texttt{void *priv} pointer in the \texttt{uio\_info} struct. We will simply allocate a \texttt{sizeof(struct uio\_uart\_privdata *)} and store it there. Upon entering a handler function, the pointer to \texttt{uio\_info} will be passed, which contains the \texttt{priv} pointer.
+
+
+    % All init code should go to userspace
+    %   "kernel part is just a thin wrapper to give userspace safe access to device memory and interrupts"
+
+
+\end{document}

@@ -1,0 +1,1 @@
+The qemu script sets up hostfwd meaning in the VM you can access the host on `ssh -p 8000 10.0.2.2`
