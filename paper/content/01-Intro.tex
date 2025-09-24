@@ -52,6 +52,7 @@
     % Practical considerations
     % - Interrupt Routing: which CPU core(s) handle my interrupts?
 
+    In this Thesis, we will primarily focus on the Mini-UART (\texttt{UART1}) found on the bcm2711 chip. This is because of two reasons: Firstly, it contains shallow FIFOs (8 bytes) that have to be read by the CPU and can't benefit from hardware acceleration or DMA. Secondly, it can run up to 32 MegaBaud.
 
 
 \end{document}

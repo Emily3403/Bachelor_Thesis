@@ -1,0 +1,92 @@
+%&../template
+\documentclass[../main.tex]{subfiles}
+\usepackage{biblatex}
+\usepackage{tikz}
+
+\begin{document}
+    \section{Writing the Kernel Module}
+    With the example \texttt{uio\_cif.c} example it is very straightforward to figure out how to write the Kernel Module.
+
+    First, we have to unregister the default serial driver for the Mini-UART. The default driver defines the \texttt{compatible} string to be \texttt{brcm,bcm2835-aux-uart}.
+
+    We overwrite the \texttt{compatible} string in the device tree file to
+    \begin{verbatim}
+&uart1 {
+    compatible = "uio_uart";
+    ...
+}
+    \end{verbatim}
+
+    With this change, the default driver won't register, and we are free to provide our own.
+
+    Probing the device is quite simple as well. To register a UIO Device we must fill the \texttt{struct uio\_info}. We provide the handle to the custom \texttt{irqcontrol()} function here and an implementation of \texttt{open()} so interrupts are only enabled once the device is used. The corresponding \texttt{release()} function disables interrupts once the driver stops using the device file.
+
+    For memory, we will have a look at the \texttt{pdev->resource[0]}. It contains all needed information to populate \texttt{struct uio\_mem} and is given by the dts. We align the memory to the page boundary, meaning it will start from \texttt{0x07e215000} and not \texttt{0x07e215040}. \todo[why?]
+
+    Local state can be maintained through the \texttt{priv} pointer in the \texttt{uio\_info struct}. We use it to keep track of enabled / disabled interrupts.
+
+    \subsection{The Interrupt Handler}
+    Our hardware needs \textit{some} action to be performed after each interrupt: Either acknowledging it by reading the byte or disabling interrupts from the hardware. This limitation is imposed by the hardware as \enquote{The Interrupt Line is asserted whenever the
+    Receive FIFO holds at least 1 byte / Transmit FIFO is empty}.
+
+    If we were not to do anything, the interrupt would be asserted before our userspace driver is scheduled and could handle the byte leading to our kernel interrupt handler being called all the time.
+
+    We present two approaches to handle this limitation: Disabling Interrupts and using the \texttt{SCRATCH} register.
+
+    \subsubsection{Disabling Interrupts}
+    This approach is the most straightforward: Simply disable receive / transmit interrupts once one occurs and return \texttt{IRQ\_HANDLED}. This will give the userspace part of the driver enough time to be scheduled and read the \texttt{IO} register. Once the byte has been read, it enables interrupts by writing a \texttt{1} to \texttt{/dev/uio0}.
+
+    The following shows a flow graph of the interrupt handling routine
+    \begin{figure}[H]
+        \centering
+        \begin{tikzpicture}
+            \draw[draw=black] (0, 0) rectangle ++(1,1);
+        \end{tikzpicture}
+        \caption{Interrupt Handling when disabling Interrupts}
+        \label{fig:disable-interrupts}
+    \end{figure}
+
+    \subsubsection{The \texttt{SCRATCH} Register}
+    The second approach we want to present is using the \texttt{SCRATCH} register. It \enquote{is a single byte of temporary storage} provided by the UART. The Kernel will, upon entering the interrupt handling routine, read the available byte from the \texttt{IO} register and save it to the \texttt{SCRATCH} register.
+
+    A limitation imposed by this approach is that we are only ever able to handle a single byte per interrupt. With the previous approach, the userspace could read check the \texttt{AUX\_MU\_STAT\_REG} register for the FIFO level and read as many bytes as there are available. With this approach, the kernel needs to place the byte from the \texttt{IO} register into the \texttt{SCRATCH} register, meaning a context switch into kernel-space is necessary for every byte.
+
+    The following shows a flow graph of the interrupt handling routine
+    \begin{figure}[H]
+        \centering
+        \begin{tikzpicture}
+            \draw[draw=black] (0, 0) rectangle ++(1,1);
+        \end{tikzpicture}
+        \caption{Interrupt Handling when buffering in the \texttt{SCRATCH} register}
+        \label{fig:scratch-register}
+    \end{figure}
+
+
+    \clearpage
+
+
+
+
+    \clearpage
+
+    As we first step, we provide a reference implementation with polling. This is the baseline in terms of performance as the CPU speed will be the bottleneck for data throughput. Next, we want to investigate the improvements we will be able to achieve with interrupts, specifically IRQ. Finally, we provide a patch for the Linux Kernel enabling the use of FIQ in UIO. The differences in latency and throughput will be of great interest.
+
+    \subsection{Enabling the UART}
+
+    Adding the following lines to \texttt{/boot/firmware/config.txt} enables the mini-UART:
+    \begin{verbatim}
+    enable_uart=1
+    core_freq=250
+    \end{verbatim}
+
+    Additionally, the linux console has to be disabled with the \texttt{raspi-config} binary\href{https://www.raspberrypi.com/documentation/computers/configuration.html\#disabling-the-linux-serial-console}. \todo[Of course, the custom dtb has to be booted by the kernel to recognize the mini-uart as a uio device]
+
+    \subsection{Measurements}
+    - How to measure?
+
+    \subsection{Details}
+    Second Raspi
+
+    - NFS Booting
+
+\end{document}

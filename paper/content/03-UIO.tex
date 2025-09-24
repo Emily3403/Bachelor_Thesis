@@ -1,0 +1,42 @@
+%&../template
+\documentclass[../main.tex]{subfiles}
+
+\begin{document}
+    \clearpage
+
+
+    \section{Linux UIO}
+    UIO is a framework developed for ...
+
+
+    \begin{quote}
+        \it
+        For many types of devices, creating a Linux kernel driver is overkill. All that is really needed is some way to handle an interrupt and provide access to the memory space of the device. [...] Hardware that is ideally suited for an UIO driver fulfills all the following:
+
+        \begin{itemize}
+            \item The device has memory that can be mapped. The device can be controlled completely by writing to this memory.
+            \item The device usually generates interrupts.
+            \item The device does not fit into one of the standard kernel subsystems.
+        \end{itemize}
+    \end{quote}
+
+    This fits very well for our usecase, the Mini-UART of the Raspberry Pi 4b, in particular because the device \enquote{has shallow FIFOs, no DMA Support}, can be controlled via Memory-Mapped-IO, meaning a simple \texttt{mmap} will suffice and it generates interrupts.
+
+    \subsection{UIO Basics}
+
+    The following is a excerpt from the Linux UIO HowTo:
+
+    Each UIO device is accessed through it's corresponding device file, \texttt{/dev/uioX}, which we'll call \texttt{/dev/uio0}.
+
+    Memory of the device can be accessed with a call to \texttt{mmap(/dev/uio0)}. Multiple mappings are also possible, and can be distinguished with the \texttt{offset} parameter of \texttt{mmap}. We will, however, only be focusing on a single mapping as the Mini-UART can be controlled with a single address space.
+
+    The Userspace part of the driver can wait for interrupts by calling \texttt{read(/dev/uio0)}. It will return as soon as an interrupt occurs and return the total interrupt count \todo[since inserting the kernel module]. This integer is monotonically increasing and, if no interrupts are missed, should always do so by 1.
+
+    UIO also implements a \texttt{write(/dev/uio0)} function which will call \texttt{irqcontrol()}. Writing a 0 disables interrupts and 1 enables them. This is intended for situations where userspace cannot determine what the interrupt source was if the interrupt is already acknowledged. In this case, the kernel can disable interrupts completely and let userspace figure out what has happened.
+
+    We will be using this approach for interrupt handling \todo[due to the abysmal interrupt interface given by broadcom].
+
+
+
+
+\end{document}
