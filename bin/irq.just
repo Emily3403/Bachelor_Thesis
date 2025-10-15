@@ -2,18 +2,12 @@
 [group("IRQ")]
 [working-directory("/home/emily/Documents/Uni/Study/Bachelor-Thesis")]
 irq-dint-module:
-    ./bin/kernel/setup.sh
-    sed -i "s|# CONFIG_UIO_IRQ_UART_DINT is not set|CONFIG_UIO_IRQ_UART_DINT=m|" "${KBUILD_OUTPUT}/.config"
-
     MODULE_PREFIX=irq MODULE_NAME=uart_dint.ko ./bin/kernel/module.sh
 
 # Builds the Kernel Module for scratch register
 [group("IRQ")]
 [working-directory("/home/emily/Documents/Uni/Study/Bachelor-Thesis")]
 irq-scratch-module:
-    ./bin/kernel/setup.sh
-    sed -i "s|# CONFIG_UIO_IRQ_UART_SCRATCH is not set|CONFIG_UIO_IRQ_UART_SCRATCH=m|" "${KBUILD_OUTPUT}/.config"
-
     MODULE_PREFIX=irq MODULE_NAME=uart_scratch.ko ./bin/kernel/module.sh
 
 # Builds an runs `listen` with disable interrupts
