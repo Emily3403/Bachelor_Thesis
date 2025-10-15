@@ -1,36 +1,37 @@
-# Cleans the entire Repo of Artifacts.
+# Cleans the entire Repo
 [group("Kernel")]
 [working-directory("/home/emily/Documents/Uni/Study/Bachelor-Thesis")]
-clean:
+kernel-clean:
     make mrproper
 
-# Clones the kernel if not present and resets the kernel .config to the default.
+# Clones the kernel if not present and resets the kernel .config to the default
 [group("Kernel")]
 [working-directory("/home/emily/Documents/Uni/Study/Bachelor-Thesis")]
-setup:
+kernel-setup:
     ./bin/kernel/setup.sh
 
-# Build the Kernel
+# Builds the Kernel
 [group("Kernel")]
 [working-directory("/home/emily/Documents/Uni/Study/Bachelor-Thesis")]
-build: setup
+kernel-build: kernel-setup
     ./bin/kernel/build.sh
 
-# Deploys the Kernel to the Raspi. Reboot the Raspi to apply the changes.
+# Deploys the Kernel to the Raspi. Reboot the Raspi to apply the changes
 [group("Kernel")]
 [working-directory("/home/emily/Documents/Uni/Study/Bachelor-Thesis")]
-deploy: build
+kernel-deploy: kernel-build
     ./bin/kernel/deploy.sh
 
-
+# Runs `listen` with the kernel driver (b2)
 [group("Kernel")]
 [working-directory("/home/emily/Documents/Uni/Study/Bachelor-Thesis")]
-listen:
+kernel-listen:
     rsync -a "uart-driver/kernel-driver/" $RASPI_STOCK_KERNEL_HOST:kernel-driver/ --exclude=venv
     ssh -t $RASPI_STOCK_KERNEL_HOST "./kernel-driver/listen.py"
 
+# Runs `send` with the kernel driver (b2)
 [group("Kernel")]
 [working-directory("/home/emily/Documents/Uni/Study/Bachelor-Thesis")]
-send:
+kernel-send:
     rsync -a "uart-driver/kernel-driver/" $RASPI_STOCK_KERNEL_HOST:kernel-driver/ --exclude=venv
     ssh $RASPI_STOCK_KERNEL_HOST "cd kernel-driver; ./send.py"

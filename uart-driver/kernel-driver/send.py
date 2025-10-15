@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
-# TODO: Accept strings from command line
+from argparse import Namespace
+from pathlib import Path
 
 from serial import Serial
 
+from utils import parse_args
+
 
 def write_serial(ser: Serial, s: str):
-    enc = (s).encode()
+    enc = s.encode()
     ser.write(enc)
     ser.flush()
     print(f"Sent: {len(enc)} bytes")
@@ -17,10 +20,11 @@ def send_string(s: str, baud: int):
         ser.reset_output_buffer()
         write_serial(ser, s)
 
+
+def main(args: Namespace) -> None:
+    contents = Path(args.file).read_text()
+    send_string(contents, args.baudrate)
+
+
 if __name__ == "__main__":
-    with open("baud.txt") as f:
-        baud = int(f.readline().strip())
-
-    with open("str.txt") as f:
-        send_string(f.readline().strip(), baud)
-
+    main(parse_args())

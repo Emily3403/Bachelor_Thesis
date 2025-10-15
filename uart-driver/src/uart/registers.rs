@@ -98,12 +98,12 @@ register_structs! {
 
 /// Initialization
 impl MiniUartRegs {
-    pub fn init(&mut self, baud: u32) -> Result<(), &'static str> {
+    pub fn init(&mut self, baudrate: u32) -> Result<(), &'static str> {
         self.reset();
         self.disable();
         self.clear();
 
-        self.set_baudrate(baud);
+        self.set_baudrate(baudrate);
         self.set_data_size();
         self.enable();
 
@@ -141,8 +141,8 @@ impl MiniUartRegs {
     ///
     /// Because we round down to the next int, we skip the -1 (don't @ me)
     /// Also, the system clock is fixed to 250MHz in our setup.
-    fn set_baudrate(&mut self, baud: u32) {
-        let baudrate_reg = 250_000_000 / (8 * baud) - 1;
+    fn set_baudrate(&mut self, baudrate: u32) {
+        let baudrate_reg = 250_000_000 / (8 * baudrate) - 1;
         self.BAUD.set(baudrate_reg);
     }
 

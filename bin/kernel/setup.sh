@@ -16,6 +16,8 @@ ln -fs "$(realpath "kernel-patches/dts/bcm2711-rpi-4-b.dts")" "$KERNEL_DIR/arch/
 echo ">> Resetting the Repo ..."
 
 make bcm2711_defconfig
-sed -i "s|CONFIG_LOCALVERSION="-v8"|CONFIG_LOCALVERSION="-Emily_UIO"|" "${KBUILD_OUTPUT}/.config"
+sed -i 's|CONFIG_LOCALVERSION="-v8"|CONFIG_LOCALVERSION="-Emily_UIO"|' "${KBUILD_OUTPUT}/.config"
+sed -i "s|# CONFIG_PREEMPT_RT is not set|CONFIG_PREEMPT_RT=y\nCONFIG_RCU_BOOST=y\nCONFIG_RCU_BOOST_DELAY=500|"      "${KBUILD_OUTPUT}/.config"
+
 sed -i "s|CONFIG_UIO=m|CONFIG_UIO=y|"                                  "${KBUILD_OUTPUT}/.config"
 sed -i "s|CONFIG_IKCONFIG=m|CONFIG_IKCONFIG=y|"                        "${KBUILD_OUTPUT}/.config"

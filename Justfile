@@ -1,9 +1,14 @@
 set dotenv-load := true
 set dotenv-path := "./.envrc"
 
-mod kernel "./bin/kernel.just"
-mod polling "./bin/polling.just"
-mod irq "./bin/irq.just"
+realtime := "false"
+
+import "./bin/kernel.just"
+import "./bin/polling.just"
+import "./bin/irq.just"
+
+default:
+  @just --list
 
 # Installs neccessary dependencies to your local machine.
 [group("Setup")]

@@ -1,4 +1,4 @@
-use crate::constants::{BAUD_STR, POLLING_DURATION, RESET_CHAR};
+use crate::constants::{POLLING_DURATION, RESET_CHAR};
 use crate::uart::registers::MiniUartRegs;
 use crate::uart::stats::{InterruptStats, TransmissionStats, UARTStats};
 use log::{debug, error, info, Log};
@@ -30,8 +30,8 @@ impl MiniUART {
         }
     }
 
-    pub fn init(&mut self) -> Result<(), &'static str> {
-        self.regs.init(BAUD_STR.parse().unwrap())?;
+    pub fn init(&mut self, baudrate: u32) -> Result<(), &'static str> {
+        self.regs.init(baudrate)?;
 
         #[cfg(feature = "driver_irq")]
         self.uio.irq_enable().unwrap();

@@ -42,39 +42,21 @@ impl Reader for MiniUART {
 }
 
 #[cfg(not(feature = "performance"))]
-pub fn infinite_read(mut uart: MiniUART) -> ! {
-    let expected = EXPECTED_BYTES;
-    let expected_len = EXPECTED_BYTES.len();
-    let mut cur_index: usize = 0;
-    let mut errors: usize = 0;
-
+pub fn infinite_read(mut uart: MiniUART, out: &mut (impl Write + ?Sized)) -> ! {
     loop {
         uart.wait_for_byte();
         let Some(c) = uart.read_byte() else {
             continue;
         };
 
-        if c == expected[cur_index] {
-            print!("{}", c as char);
-        } else {
-            println!(
-                "\nERROR: Incorrect char '{}', expected '{}'",
-                c as char, expected[cur_index] as char
-            );
-        }
-        errors += 1;
-        stdout().flush().unwrap();
-
-        cur_index += 1;
-        cur_index %= expected_len;
+        out.write_all(&[c]).unwrap();
     }
 }
 
 #[cfg(feature = "performance")]
-pub fn infinite_read(mut uart: MiniUART) -> ! {
+pub fn infinite_read(mut uart: MiniUART, out: &mut (impl Write + ?Sized)) -> ! {
     loop {
         uart.wait_for_byte();
-        // uart.read_byte();
-        print!("{}", uart.read_byte() as char);
+        out.write_all(&[uart.read_byte()]).unwrap()
     }
 }
