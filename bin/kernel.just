@@ -33,5 +33,5 @@ kernel-listen:
 [group("Kernel")]
 [working-directory("/home/emily/Documents/Uni/Study/Bachelor-Thesis")]
 kernel-send:
-    rsync -a "uart-driver/kernel-driver/" $RASPI_STOCK_KERNEL_HOST:kernel-driver/ --exclude=venv
-    ssh $RASPI_STOCK_KERNEL_HOST "cd kernel-driver; ./send.py"
+    rsync -aL "uart-driver/kernel-driver/" $RASPI_STOCK_KERNEL_HOST:kernel-driver/ --exclude=venv
+    ssh $RASPI_STOCK_KERNEL_HOST "cd kernel-driver; ./send.py -b '{{ baudrate }}' -f '{{ send-file }}'"

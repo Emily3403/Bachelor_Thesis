@@ -1,6 +1,7 @@
 import os
 import re
 import subprocess
+from pathlib import Path
 
 
 def load_env(path=".envrc"):
@@ -8,6 +9,7 @@ def load_env(path=".envrc"):
 
     env = os.environ.copy()
     env["PATH"] += ":/home/emily/bin"
+    env["SSH_AUTH_SOCK"] = "/run/user/1000/ssh-agent.socket"
 
     with open(path, 'r') as f:
         for line in f:
@@ -29,6 +31,7 @@ def load_env(path=".envrc"):
                     # Expand variables in the value
                     value = expand_variables(value, env)
                     env[key] = value
+                    os.environ[key] = value
 
     return env
 
@@ -70,3 +73,4 @@ def expand_variables(value, env):
     value = re.sub(r'\$\(([^)]+)\)', replace_command, value)
 
     return value
+

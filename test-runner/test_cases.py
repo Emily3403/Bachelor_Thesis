@@ -1,12 +1,11 @@
-import itertools
 import os
-import string
 from dataclasses import dataclass, field
+from pathlib import Path
+from subprocess import Popen, PIPE
 from time import sleep
 from typing import Any
-from subprocess import Popen, PIPE
 
-from dotenv import dotenv_values, load_dotenv
+from settings import app_path
 
 
 @dataclass
@@ -14,50 +13,99 @@ class TestCase:
     """
     An Instance of a TestCase, having all the information needed for executing it
     """
+    test_name: str
     test_pattern: str
+    iteration: int
+
     baudrate: int
     realtime: bool
 
-    just_listen_command: list[str]
+    just_command: str
     listen_command: None | Popen = field(default=None)
-    send_command: None | Popen = field(default=None)
 
     def run(self, env: dict[Any, Any]) -> None:
-        self.listen_command = Popen(self.just_listen_command, env=env,stdout=PIPE, stderr=PIPE)
+        if self.stdout_path().exists():
+            print("SKIPPED")
+            return
 
-        os.set_blocking(self.listen_command.stdout.fileno(), False)
+        self.setup(env)
+
+        self.listen_command = Popen(["just", f"baudrate={self.baudrate}", f"save-dir={self.raspi_save_dir()}", self.just_command], env=env, stdout=PIPE, stderr=PIPE)
         os.set_blocking(self.listen_command.stderr.fileno(), False)
 
+        output = []
+
         while True:
-            stdout = self.listen_command.stdout.read()
             stderr = self.listen_command.stderr.read()
 
-            if stdout:
-                print(stdout.decode(), end="")
-            if stderr:
-                print(stderr.decode(), end="")
-
+            if stderr is not None:
+                output.append(stderr.decode())
                 if "infinite listen" in stderr.decode():
                     break
 
             sleep(0.1)
+            ret = self.listen_command.poll()
+            if ret is not None:
+                print(f"ERROR: listen has terminated: {ret} {self!r}")
+                print("\n".join(output))
+                return
 
-        print("Done setting up, sending now!")
-        self.send_command = Popen(["just", "kernel", "send"], env=env)
-        send_out = self.send_command.communicate()
-        print("Done sending!")
+        self.send_string(env)
+        self.kill_listen()
 
-        # os.system("ssh $RASPI_CUSTOM_KERNEL_HOST 'kill $(lsof -t /dev/uio0) || true &> /dev/null'")
         listen_out = self.listen_command.communicate()
 
+        self.get_results(env)
+
+    def send_string(self, env: dict[Any, Any]) -> None:
+        print("Sending...")
+        ret = Popen(["just", f"baudrate={self.baudrate}", f"send-file=./test-cases/{self.test_name}/{self.baudrate}/stdin", "kernel-send"], env=env).wait()
+        if ret != 0:
+            print("ERROR: Send command")
+            return
+
+        print("Done!")
+
+    def kill_listen(self) -> None:
+        if self.listen_command:
+            os.system("ssh $RASPI_CUSTOM_KERNEL_HOST 'kill $(lsof -t /dev/uio0) || true &> /dev/null'")
+
+    def setup(self, env: dict[Any, Any]):
+        os.makedirs(self.test_case_path(), exist_ok=True)
+        self.generate_stdin_file()
+
+    def raspi_save_dir(self) -> Path:
+        return Path("./test-cases/") / self.test_name / str(self.baudrate) / self.just_command
 
 
-TEST_PATTERNS = [string.ascii_letters, "A"]
-BAUDRATES = [9600, 19200, 57600, 115200]
-JUST_COMMANDS = [["just", "polling", "listen"], ["just", "irq", "dint-listen"], ["just", "irq", "scratch-listen"]]
-REALTIME = [False, True]
+    def test_dir_path(self) -> Path:
+        return app_path / "test-cases" / str(self.iteration) / self.test_name / str(self.baudrate)
 
-TESTCASES = [
-    TestCase(test_pattern=pattern, just_listen_command=command, baudrate=baud, realtime=rt)
-    for pattern, baud, command, rt in itertools.product(TEST_PATTERNS, BAUDRATES, JUST_COMMANDS, REALTIME)
-]
+    def test_case_path(self) -> Path:
+        return self.test_dir_path() / self.just_command
+
+    def stdin_path(self) -> Path:
+        return self.test_dir_path() / "stdin"
+
+    def stdout_path(self) -> Path:
+        return self.test_dir_path() / "stdout"
+
+    def generate_stdin_file(self) -> None:
+        path = self.stdin_path()
+        # if path.exists():
+        #     return
+
+        pattern = self.test_pattern + "\n"
+        wanted_len = int(0.5 * self.baudrate)
+
+        a, b = divmod(wanted_len, len(pattern))
+        stdin = pattern * a + pattern[:b]
+
+        path.write_text(stdin)
+
+    def get_results(self, env: dict[Any, Any]) -> int:
+        return Popen(["rsync", "-a", f"b1:{self.raspi_save_dir()}/", f"{self.test_case_path()}/"], env=env).wait()
+
+
+    def analyze(self) -> None:
+        pass

@@ -2,6 +2,10 @@ set dotenv-load := true
 set dotenv-path := "./.envrc"
 
 realtime := "false"
+baudrate := "9600"
+send-file := "./str.txt"
+save-dir := "None"
+
 
 import "./bin/kernel.just"
 import "./bin/polling.just"

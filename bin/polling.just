@@ -8,10 +8,14 @@ polling-module:
 [group('Polling')]
 [working-directory("/home/emily/Documents/Uni/Study/Bachelor-Thesis/uart-driver")]
 polling-listen: polling-module
-    BINARY_NAME=listen FEATURES=driver_polling,io_data REALTIME={{ realtime }} ./deploy.sh
+    BINARY_NAME=listen FEATURES=driver_polling,io_data \
+      BAUDRATE="{{ baudrate }}" SAVEDIR="{{ save-dir }}" REALTIME="{{ realtime }}" \
+      ./deploy.sh
 
 # Builds an runs `send` with polling
 [group('Polling')]
 [working-directory("/home/emily/Documents/Uni/Study/Bachelor-Thesis/uart-driver")]
 polling-send: polling-module
-    BINARY_NAME=polling-send FEATURES=driver_polling,io_data REALTIME={{ realtime }} ./deploy.sh
+    BINARY_NAME=polling-send FEATURES=driver_polling,io_data \
+      BAUDRATE="{{ baudrate }}" SAVEDIR="{{ save-dir }}" REALTIME="{{ realtime }}" \
+      ./deploy.sh

@@ -1,8 +1,9 @@
 #![feature(stmt_expr_attributes)]
 
-use std::io::{stdout, Write};
 use clap::Parser;
 use log::{error, info, logger};
+use std::fs::{create_dir_all, File};
+use std::io::{stdout, Write};
 use text_diff::diff;
 use uart_lib::cli::Cli;
 use uart_lib::constants::EXPECTED_BYTES;
@@ -17,10 +18,13 @@ pub fn main() {
     info!("Going into infinite listen!");
     stdout().flush().unwrap();
 
-    let out = if let Some(it) = cli.savedir {
+    if let Some(save_dir) = cli.savedir {
+        create_dir_all(&save_dir).unwrap();
+        let mut stdout = File::create(save_dir.join("stdout")).unwrap();
 
+        infinite_read(uart, &mut stdout);
     } else {
-
+        infinite_read(uart, &mut stdout());
+        
     };
-    infinite_read(uart, &mut stdout());
 }
