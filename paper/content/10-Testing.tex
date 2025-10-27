@@ -1,0 +1,75 @@
+%&../template
+\documentclass[../main.tex]{subfiles}
+
+\begin{document}
+
+    \clearpage
+    \section{Testing}
+
+    In order to test for packet loss, latency we need a reproducible testing suite.
+
+    The test setup is as follows
+    \begin{enumerate}
+        \item Text to send is generated
+        \item All files are transferred to the raspis
+        \item \texttt{just listen} is executed
+        \item The string is sent
+        \item The listener is stopped
+    \end{enumerate}
+
+    \bigskip
+    We parametrize over the following
+    \begin{itemize}
+        \item String Pattern
+        \item Implementation (polling vs. scratch register vs. disable interrupts)
+        \item Baudrate
+        \item Realtime priority
+    \end{itemize}
+
+    \bigskip
+    We want to be able to know the status of each byte:
+    \begin{itemize}
+        \item Successfully transmitted
+        \item Wrong byte received
+        \item Dropped
+    \end{itemize}
+
+    \subsection{Test Packet}
+    The serial driver we implemented deals with bytes. In order to detect errors in the communication, we add a packet layer on top that can reveal if a single packet has been transmitted successfully.
+
+    This packet contains
+    \begin{itemize}
+        \item \verb|start_byte| A \enquote{magic byte} that isn't used in the data: \verb|255|
+        \item \verb|sequence_num: int|
+        \item \verb|data: str|
+    \end{itemize}
+
+    \subsection{Test Pattern}
+    We are transmitting sequence of bytes, a stream.
+
+    For a specific test, we send the same pattern over and over again with sequence number to analyze the output afterwards:
+    \begin{verbatim}
+    {pattern} {delimiter} {pattern} {delimiter} ...
+    \end{verbatim}
+
+    If we were sending \verb|abc| delimited by \verb-|- the transmitted string would look as follows
+    \begin{verbatim}
+        abc|abc|abc| ...
+    \end{verbatim}
+
+    To know the status of each byte
+
+    \subsection{Comparing outputs}
+    We compare outputs by splitting them into logical blocks. Each block is delimited by \verb-|{id}\n- where \texttt{id} is zero-padded to the maximum length.
+
+    If we repeat the pattern $n$ times, we have $n$ different string delimiters (\verb-|000\n-, \verb-|001\n-, \verb-|002\n-, \ldots) that separate the string that is sent into $n-1$ blocks.
+
+    Each block contains the \texttt{id} at the end which can be used to check if any block is missing.
+
+    Because we may have packet loss or bytes can be transferred incorrectly, we cannot assume that all delimiters have been transmitted correctly. Thus, we first check all the lines that were in fact delimited correctly, before trying to figure out what happened with the rest.
+
+    After going over all lines where the delimiter was transmitted correctly, we go over all blocks that don't contain a delimiter as specified earlier. For each of these blocks, we know the previous and the next successful block.
+
+    Now we look how many \texttt{id}'s are between 
+
+\end{document}

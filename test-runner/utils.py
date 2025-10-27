@@ -74,3 +74,8 @@ def expand_variables(value, env):
 
     return value
 
+def check_ending(a: str, b: str):
+    return a[-5:] == b[-5:]
+
+def find_nonces(it: str) -> list[str]:
+    return re.findall("\|(\d+)\n", it)

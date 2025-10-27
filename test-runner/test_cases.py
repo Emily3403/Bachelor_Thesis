@@ -1,11 +1,13 @@
 import os
+import random
 from dataclasses import dataclass, field
+from math import log
 from pathlib import Path
 from subprocess import Popen, PIPE
 from time import sleep
 from typing import Any
 
-from settings import app_path
+from settings import app_path, delimit
 
 
 @dataclass
@@ -88,24 +90,20 @@ class TestCase:
         return self.test_dir_path() / "stdin"
 
     def stdout_path(self) -> Path:
-        return self.test_dir_path() / "stdout"
+        return self.test_case_path() / "stdout"
 
     def generate_stdin_file(self) -> None:
         path = self.stdin_path()
-        # if path.exists():
-        #     return
+        if path.exists():
+            return
 
-        pattern = self.test_pattern + "\n"
         wanted_len = int(0.5 * self.baudrate)
 
-        a, b = divmod(wanted_len, len(pattern))
-        stdin = pattern * a + pattern[:b]
+        num_reps, num_chars_left = divmod(wanted_len, len(self.test_pattern) + 5)
+        patterns = [[self.test_pattern, delimit(i, int(log(num_reps, 10)) + 1), "\n"] for i in range(num_reps)]
+        stdin = "".join(it for row in patterns for it in row)
 
         path.write_text(stdin)
 
     def get_results(self, env: dict[Any, Any]) -> int:
         return Popen(["rsync", "-a", f"b1:{self.raspi_save_dir()}/", f"{self.test_case_path()}/"], env=env).wait()
-
-
-    def analyze(self) -> None:
-        pass
