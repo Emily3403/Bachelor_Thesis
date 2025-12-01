@@ -100,7 +100,7 @@ class TestCase:
         wanted_len = int(0.5 * self.baudrate)
 
         num_reps, num_chars_left = divmod(wanted_len, len(self.test_pattern) + 5)
-        patterns = [[self.test_pattern, delimit(i, int(log(num_reps, 10)) + 1), "\n"] for i in range(num_reps)]
+        patterns = [[self.test_pattern, chr(i % 65535), "\n"] for i in range(num_reps)]
         stdin = "".join(it for row in patterns for it in row)
 
         path.write_text(stdin)

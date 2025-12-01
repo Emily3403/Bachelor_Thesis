@@ -1,29 +1,22 @@
 use std::error::Error;
 use std::fmt;
 use std::fmt::{Display, Formatter};
-use std::string::FromUtf8Error;
 
 #[derive(Debug)]
-pub enum TransmissionError {
-    FifOverflow,  // :o
-    UTF8Encoding(FromUtf8Error)
+pub enum RxError {
+    ChecksumMismatch,
+    InvalidSeqNum,  // TODO: This would require too keep track of transmission state
 }
 
-pub type TransmissionResult<T> = Result<T, TransmissionError>;
+pub type RxResult<T> = Result<T, RxError>;
 
-impl Error for TransmissionError {}
+impl Error for RxError {}
 
-impl Display for TransmissionError {
+impl Display for RxError {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         match self {
-            TransmissionError::FifOverflow => write!(f, "FIFO Overflow"),
-            TransmissionError::UTF8Encoding(it) => write!(f, "UTF8 Encoding Error: {it}")
+            RxError::ChecksumMismatch => write!(f, "ChecksumMismatch"),
+            RxError::InvalidSeqNum => write!(f, "InvalidSeqNum"),
         }
-    }
-}
-
-impl From<FromUtf8Error> for TransmissionError {
-    fn from(value: FromUtf8Error) -> Self {
-        Self::UTF8Encoding(value)
     }
 }

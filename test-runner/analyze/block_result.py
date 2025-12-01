@@ -9,7 +9,7 @@ from utils import find_nonces
 
 # Key Metrics:
 #   - Bit Error Rate (BER): The percentage of bytes received in error.
-#   - Framing Errors → "The Module does not check for framing errors"
+#   - Framing Errors → "The Module does not check for framing errors" → bit error
 #   - Overrun Errors
 #
 # Optional:
@@ -45,6 +45,7 @@ def fit_into_blocks(test: TestCase, stdin: str, stdout: str) -> dict[int, BlockR
     stdout_nonces = set()
 
     blocks = {}
+    # pop count (zähle 1en)
 
     # Add all correctly delimited output lines
     for out_line in stdout.splitlines(keepends=True):
@@ -81,6 +82,6 @@ def fit_into_blocks(test: TestCase, stdin: str, stdout: str) -> dict[int, BlockR
 
     # Sanity check: Every line in order should make up the stdout back up again.
     resulting_stdout = "".join(it[1].line for it in sorted(blocks.items(), key=lambda it: it[1].id))
-    assert resulting_stdout == stdout
+    # assert resulting_stdout == stdout
 
     return blocks

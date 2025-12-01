@@ -1,7 +1,7 @@
 use crate::constants::RESET_SLEEP_DURATION;
 use crate::uart::registers::CNTL::{RX_DISABLED, TX_DISABLED};
+use crate::uart::stats::UARTStats;
 use std::thread::sleep;
-use log::info;
 use tock_registers::interfaces::{ReadWriteable, Readable, Writeable};
 use tock_registers::registers::{ReadOnly, ReadWrite};
 use tock_registers::{register_bitfields, register_structs};
@@ -127,7 +127,6 @@ impl MiniUartRegs {
 
     fn disable(&mut self) {
         self.CNTL.write(TX_DISABLED::CLEAR + RX_DISABLED::CLEAR);
-
     }
 
     fn clear(&mut self) {
@@ -187,5 +186,24 @@ impl MiniUartRegs {
 
     pub fn tx_byte_ready(&mut self) -> bool {
         self.LSR.is_set(LSR::TX_EMPTY)
+    }
+
+    pub fn read_stats(&mut self) -> UARTStats {
+        let reg = self.STAT.extract();
+
+        UARTStats {
+            tx_num_bytes: reg.read(STAT::TX_FIFO_NUMBYTES) as u8,
+            rx_num_bytes: reg.read(STAT::RX_FIFO_NUMBYTES) as u8,
+            tx_done: reg.is_set(STAT::TX_DONE),
+            tx_empty: reg.is_set(STAT::TX_FIFO_EMPTY),
+            cts: reg.is_set(STAT::CTS),
+            rts: reg.is_set(STAT::RTS),
+            tx_full: reg.is_set(STAT::TX_FIFO_FULL),
+            rx_overrun: reg.is_set(STAT::RX_FIFO_OVERRUN),
+            tx_idle: reg.is_set(STAT::TX_IDLE),
+            rx_idle: reg.is_set(STAT::RX_IDLE),
+            tx_ready: reg.is_set(STAT::TX_READY),
+            rx_ready: reg.is_set(STAT::RX_READY),
+        }
     }
 }

@@ -2,7 +2,7 @@ set dotenv-load := true
 set dotenv-path := "./.envrc"
 
 realtime := "false"
-baudrate := "9600"
+baudrate := "500000"
 send-file := "./str.txt"
 save-dir := "None"
 

@@ -1,3 +1,4 @@
+use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter};
 
 #[derive(Default, Clone)]
@@ -11,7 +12,7 @@ pub struct TransmissionStats {
     pub bytes_sent: u32,
 }
 
-#[derive(Default, Clone)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UARTStats {
     pub tx_num_bytes: u8, // 0-8
     pub rx_num_bytes: u8, // 0-8

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from analyze.block_result import analyze_testcase
+from analyze import analyze_testcase
 from test_parameters import TESTCASES
 from utils import load_env
 
