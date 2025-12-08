@@ -16,6 +16,7 @@ JUST_COMMANDS = [
     "irq-scratch-listen",
 ]
 REALTIME = [False, True]
+PACKET_NUM_DATA_BYTES = [2]
 
 ITERATION = 0
 
@@ -27,6 +28,7 @@ TESTCASES = [
         just_command=command,
         baudrate=baud,
         realtime=rt,
+        packet_num_data_bytes=pndb,
     )
-    for (name, pattern), baud, command, rt in itertools.product(TEST_NAME_AND_PATTERNS, BAUDRATES, JUST_COMMANDS, REALTIME)
+    for (name, pattern), baud, command, rt, pndb in itertools.product(TEST_NAME_AND_PATTERNS, BAUDRATES, JUST_COMMANDS, REALTIME, PACKET_NUM_DATA_BYTES)
 ]

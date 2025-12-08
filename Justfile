@@ -5,6 +5,7 @@ realtime := "false"
 baudrate := "500000"
 send-file := "./str.txt"
 save-dir := "None"
+packet-num-data-bytes := "2"  # TODO
 
 
 import "./bin/kernel.just"

@@ -1,5 +1,5 @@
 from analyze.block_result import fit_into_blocks
-from analyze.packets import analyze_packets
+from analyze.packets import Packet
 from test_cases import TestCase
 
 
@@ -8,8 +8,16 @@ def analyze_testcase(it: TestCase) -> None:
     try:
         stdout = it.stdout_path().read_text()
     except Exception as e:
-        pass
+        print(f"ERROR reading {it.stdout_path()}: {e!r}")
+        return
 
-    packets = analyze_packets(it, stdin, stdout)
+    packets = []
+    for line in stdout.splitlines():
+        if line.startswith("Packet "):
+            packets.append(Packet.from_json(line[7:]))
+        elif line.startswith("Checksum Error"):
+            pass
 
-    blocks = fit_into_blocks(it, stdin, stdout)
+    pass
+
+

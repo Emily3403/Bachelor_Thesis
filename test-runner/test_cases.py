@@ -21,6 +21,7 @@ class TestCase:
 
     baudrate: int
     realtime: bool
+    packet_num_data_bytes: int
 
     just_command: str
     listen_command: None | Popen = field(default=None)
@@ -32,7 +33,7 @@ class TestCase:
 
         self.setup(env)
 
-        self.listen_command = Popen(["just", f"baudrate={self.baudrate}", f"save-dir={self.raspi_save_dir()}", self.just_command], env=env, stdout=PIPE, stderr=PIPE)
+        self.listen_command = Popen(["just", f"baudrate={self.baudrate}", f"save-dir={self.raspi_save_dir()}", f"packet-num-data-bytes={self.packet_num_data_bytes}", self.just_command], env=env, stdout=PIPE, stderr=PIPE)
         os.set_blocking(self.listen_command.stderr.fileno(), False)
 
         output = []
@@ -48,7 +49,7 @@ class TestCase:
             sleep(0.1)
             ret = self.listen_command.poll()
             if ret is not None:
-                print(f"ERROR: listen has terminated: {ret} {self!r}")
+                print(f"ERROR: listen has terminated: {ret} {self!r}\n")
                 print("\n".join(output))
                 return
 
@@ -93,6 +94,7 @@ class TestCase:
         return self.test_case_path() / "stdout"
 
     def generate_stdin_file(self) -> None:
+        """Generates a file with a certain length, depending on the baudrate"""
         path = self.stdin_path()
         if path.exists():
             return
