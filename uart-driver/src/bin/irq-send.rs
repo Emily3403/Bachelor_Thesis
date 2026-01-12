@@ -3,5 +3,5 @@
 use uart_lib::init_uart;
 
 pub fn main() {
-    let uart = init_uart();
+    let _uart = init_uart(32);
 }

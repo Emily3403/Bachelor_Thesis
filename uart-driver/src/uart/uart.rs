@@ -1,6 +1,6 @@
 use crate::uart::registers::MiniUartRegs;
-use uio::UioDevice;
 use crate::uart::stats::UARTStats;
+use uio::UioDevice;
 
 pub struct MiniUART {
     pub regs: &'static mut MiniUartRegs,
