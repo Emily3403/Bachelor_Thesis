@@ -40,11 +40,7 @@ impl Display for UARTStats {
 
 impl Display for InterruptStats {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "total={}; missed={}",
-            self.total_interrupts, self.missed_interrupts
-        )
+        write!(f, "total={}; missed={}", self.total_interrupts, self.missed_interrupts)
     }
 }
 

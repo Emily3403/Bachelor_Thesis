@@ -1,9 +1,16 @@
 use crate::uart::registers::MiniUartRegs;
 use uio::UioDevice;
+use crate::uart::stats::UARTStats;
 
 pub struct MiniUART {
     pub regs: &'static mut MiniUartRegs,
     pub uio: UioDevice,
+}
+
+impl MiniUART {
+    pub fn read_stats(&self) -> UARTStats {
+        self.regs.read_stats()
+    }
 }
 
 /// Private API

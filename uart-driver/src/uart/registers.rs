@@ -188,7 +188,7 @@ impl MiniUartRegs {
         self.LSR.is_set(LSR::TX_EMPTY)
     }
 
-    pub fn read_stats(&mut self) -> UARTStats {
+    pub fn read_stats(&self) -> UARTStats {
         let reg = self.STAT.extract();
 
         UARTStats {

@@ -5,7 +5,7 @@ use std::fmt::{Display, Formatter};
 #[derive(Debug)]
 pub enum RxError {
     ChecksumMismatch,
-    InvalidSeqNum,  // TODO: This would require too keep track of transmission state
+    InvalidSeqNum, // TODO: This would require too keep track of transmission state
 }
 
 pub type RxResult<T> = Result<T, RxError>;

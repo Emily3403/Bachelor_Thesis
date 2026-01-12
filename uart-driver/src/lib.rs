@@ -1,12 +1,18 @@
+extern crate core;
+
 use crate::uart::uart::MiniUART;
-use std::process::Command;
+use std::sync::mpsc::Sender;
+use std::thread;
+use std::thread::JoinHandle;
 use uio::UioDevice;
 
 pub mod cli;
 pub mod constants;
 pub mod uart;
 
+use crate::cli::Cli;
 use mutually_exclusive_features::exactly_one_of;
+
 exactly_one_of!("driver_irq", "driver_polling");
 exactly_one_of!("io_data", "io_scratch");
 
@@ -25,4 +31,16 @@ pub fn init_uart(baudrate: u32) -> MiniUART {
     uart.init(baudrate).unwrap();
 
     uart
+}
+
+
+pub fn spawn_uart_thread(cli: &Cli, tx: Sender<u8>, uart: &'static mut MiniUART) -> JoinHandle<()> {
+    let baud = cli.baudrate;
+
+    thread::spawn(move || {
+        loop {
+            let it = uart.get_byte();
+            tx.send(it).unwrap();
+        }
+    })
 }
