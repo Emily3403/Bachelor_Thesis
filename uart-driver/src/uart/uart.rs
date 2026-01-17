@@ -8,7 +8,7 @@ pub struct MiniUART {
 }
 
 impl MiniUART {
-    pub fn read_stats(&self) -> UARTStats {
+    pub fn get_stats(&self) -> UARTStats {
         self.regs.read_stats()
     }
 }

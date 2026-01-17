@@ -11,6 +11,8 @@ pub mod constants;
 pub mod uart;
 
 use mutually_exclusive_features::exactly_one_of;
+use crate::cli::Cli;
+use crate::uart::stats::UARTStats;
 
 exactly_one_of!("driver_irq", "driver_polling");
 exactly_one_of!("io_data", "io_scratch");
@@ -33,11 +35,16 @@ pub fn init_uart(baudrate: u32) -> MiniUART {
 }
 
 
-pub fn spawn_uart_thread(tx: Sender<u8>, uart: &'static mut MiniUART) -> JoinHandle<()> {
+pub fn spawn_uart_thread(tx: Sender<(u8, Option<UARTStats>)>, cli: &Cli) -> JoinHandle<()> {
+    let baud = cli.baudrate;
+
     thread::spawn(move || {
+        let mut uart = init_uart(baud);
+
         loop {
-            let it = uart.get_byte();
-            tx.send(it).unwrap();
+            let data = uart.get_byte();
+            let stats = uart.get_stats();
+            tx.send((data, Some(stats))).unwrap();
         }
     })
 }
