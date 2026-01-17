@@ -11,6 +11,7 @@ def main() -> None:
     for testcase in TESTCASES:
         testcase.run(env)
         analyze_testcase(testcase)
+        # TODO: Export testcase data (stats) to LaTeX .dat → pgfplots
 
 
 if __name__ == '__main__':

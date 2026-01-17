@@ -1,7 +1,7 @@
 use crate::constants::LENGTH_OF_DATA;
-use crate::uart::packet::ReceivedPacket::{ChecksumMismatch, Okayy, SeqNumMismatch};
 use crate::uart::stats::UARTStats;
 use crate::uart::uart::MiniUART;
+use bitflags::bitflags;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter};
 use std::io::Write;
@@ -14,41 +14,53 @@ pub struct Packet {
     pub data: [u8; LENGTH_OF_DATA],
 
     pub stats: UARTStats,
+    pub errors: PacketErrors,
 }
 
-#[derive(Serialize, Deserialize)]
-pub enum ReceivedPacket {
-    Okayy(Packet),
-    ChecksumMismatch { packet: Packet, val: u8, expected: u8 },
-    SeqNumMismatch { packet: Packet, val: u8, expected: u8 },
+bitflags! {
+    #[derive(Serialize, Deserialize)]
+    pub struct PacketErrors: u8 {
+        const CHECKSUM_MISMATCH = 0b0001;
+        const SEQNUM_MISMATCH   = 0b0010;
+    }
 }
 
-impl Display for ReceivedPacket {
+impl Display for Packet {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", serde_json::to_string(self).unwrap())
     }
 }
 
-impl ReceivedPacket {
+impl Packet {
+    pub fn is_valid(&self) -> bool {
+        self.errors.is_empty()
+    }
+
     pub fn from_bytes(seq_num: u8, last_seq_num: u8, checksum: u8, data: [u8; LENGTH_OF_DATA], stats: UARTStats) -> Self {
-        let packet = Packet { seq_num, checksum, data, stats };
+        let mut errors = PacketErrors::empty();
 
         let expected_checksum = calculate_checksum(data);
         if expected_checksum != checksum {
-            return ChecksumMismatch { packet, val: checksum, expected: expected_checksum };
+            errors.insert(PacketErrors::CHECKSUM_MISMATCH)
         }
 
         let expected_seq_num = last_seq_num.wrapping_add(1);
         if seq_num != expected_seq_num {
-            return SeqNumMismatch { packet: packet, val: seq_num, expected: expected_seq_num };
+            errors.insert(PacketErrors::SEQNUM_MISMATCH)
         }
 
-        Okayy(packet)
+        Packet {
+            seq_num,
+            checksum,
+            data,
+            stats,
+            errors: PacketErrors::empty(),
+        }
     }
 }
 
 // No reference to MiniUART →
-pub fn decode_packets(tx: Receiver<u8>, packets: &mut Vec<ReceivedPacket>, out: &mut (impl Write + ?Sized), uart: &MiniUART) -> ! {
+pub fn decode_packets(tx: Receiver<u8>, packets: &mut Vec<Packet>, out: &mut (impl Write + ?Sized), uart: &MiniUART) -> ! {
     let mut last_seq_num: u8 = 255;
 
     loop {
@@ -62,10 +74,10 @@ pub fn decode_packets(tx: Receiver<u8>, packets: &mut Vec<ReceivedPacket>, out: 
 
         let stats = uart.read_stats();
 
-        let packet = ReceivedPacket::from_bytes(seq_num, last_seq_num, checksum, data, stats);
+        let packet = Packet::from_bytes(seq_num, last_seq_num, checksum, data, stats);
         out.write_all(format!("{packet}\n").as_bytes()).unwrap();
 
-        if let Okayy(_) = packet {
+        if packet.is_valid() {
             last_seq_num = last_seq_num.wrapping_add(1);
         }
         packets.push(packet);
