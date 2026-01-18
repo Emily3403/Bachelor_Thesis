@@ -1,9 +1,9 @@
 use crate::constants::LENGTH_OF_DATA;
+use crate::uart::logger::Logger;
 use crate::uart::stats::UARTStats;
 use bitflags::bitflags;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter};
-use std::io::Write;
 use std::sync::mpsc::Receiver;
 
 #[derive(Serialize, Deserialize)]
@@ -58,7 +58,7 @@ impl Packet {
     }
 }
 
-pub fn decode_packets(tx: Receiver<(u8, Option<UARTStats>)>, packets: &mut Vec<Packet>, out: &mut (impl Write + ?Sized)) -> ! {
+pub fn decode_packets(tx: Receiver<(u8, Option<UARTStats>)>, packets: &mut Vec<Packet>, logger: &mut Logger) -> ! {
     let mut last_seq_num: u8 = 255;
 
     loop {
@@ -66,6 +66,8 @@ pub fn decode_packets(tx: Receiver<(u8, Option<UARTStats>)>, packets: &mut Vec<P
         macro_rules! get_byte {
             () => {{
                 let (data, stats) = tx.recv().unwrap();
+                logger.log_byte(data, &stats);
+
                 if let Some(it) = stats {
                     all_stats.push(it);
                 }
@@ -82,7 +84,7 @@ pub fn decode_packets(tx: Receiver<(u8, Option<UARTStats>)>, packets: &mut Vec<P
         }
 
         let packet = Packet::from_bytes(seq_num, last_seq_num, checksum, data, all_stats);
-        out.write_all(format!("{packet}\n").as_bytes()).unwrap();
+        logger.log_packet(&packet);
 
         if packet.is_valid() {
             last_seq_num = last_seq_num.wrapping_add(1);

@@ -1,4 +1,5 @@
 use clap::Parser;
+use std::env;
 use std::path::PathBuf;
 
 #[derive(Parser, Debug)]
@@ -7,6 +8,22 @@ pub struct Cli {
     #[arg(short, long, default_value = "9600")]
     pub baudrate: u32,
 
-    #[arg(short, long, help = "Optional Path to save results to.", default_value=None, value_parser)]
-    pub savedir: Option<PathBuf>,
+    #[arg(short, long, help = "Optional Path to save results to.", default_value = "uart-out", value_parser)]
+    pub savedir: PathBuf,
+
+    /// Info logs everything: Packets.log, data, etc
+    /// Error logs nothing except errors, no data
+    #[arg(long, default_value = "info", value_parser=parse_loglevel)]
+    pub loglevel: String,
+}
+
+pub fn parse_loglevel(level: &str) -> Result<String, String> {
+    // log::LOG_LEVEL_NAMES is private :/
+    let level = level.to_lowercase();
+    if level == "off" || level == "error" || level == "warn" || level == "info" || level == "debug" || level == "trace" {
+        unsafe { env::set_var("RUST_LOG", &level) };
+        return Ok(level.into());
+    }
+
+    Err(format!(r#"Expected loglevel to be in {{"off", "error", "warn", "info", "debug", "trace"}}, got "{level}""#))
 }

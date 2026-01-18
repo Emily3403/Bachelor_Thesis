@@ -10,9 +10,9 @@ pub mod cli;
 pub mod constants;
 pub mod uart;
 
-use mutually_exclusive_features::exactly_one_of;
 use crate::cli::Cli;
 use crate::uart::stats::UARTStats;
+use mutually_exclusive_features::exactly_one_of;
 
 exactly_one_of!("driver_irq", "driver_polling");
 exactly_one_of!("io_data", "io_scratch");
