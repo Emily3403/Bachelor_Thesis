@@ -5,22 +5,21 @@ from pathlib import Path
 
 from serial import Serial
 
-from utils import parse_args
-
-
-packet_data_length = 1
+from utils import parse_args, calculate_checksum, BYTEORDER, PACKET_DATA_LENGTH
 
 
 def write_serial(ser: Serial, s: str):
     encoded = s.encode()
 
-    for i, data in enumerate(batched(encoded, packet_data_length), start=5):
-        ser.write((i % 255).to_bytes(1, "big"))
-        ser.write(data)
-        ser.write((0).to_bytes(1, "big"))
+    for i, data in enumerate(batched(encoded, PACKET_DATA_LENGTH), start=5):
+        data_to_send = bytes(data)
+
+        ser.write((i % 255).to_bytes(1, BYTEORDER))  # seq_num
+        ser.write(calculate_checksum(data_to_send))         # checksum
+        ser.write(data_to_send)                             # data
 
     ser.flush()
-    print(f"Sent: {i * (2 + packet_data_length)} bytes")
+    print(f"Sent: {i * (2 + PACKET_DATA_LENGTH)} bytes")
 
 
 def send_string(s: str, baud: int):

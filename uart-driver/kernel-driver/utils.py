@@ -1,5 +1,9 @@
 import sys
 from argparse import Namespace, ArgumentParser
+from typing import Literal
+
+PACKET_DATA_LENGTH = 1
+BYTEORDER: Literal['big' | 'little'] = "big"
 
 
 def parse_args() -> Namespace:
@@ -9,3 +13,9 @@ def parse_args() -> Namespace:
     parser.add_argument("-f", "--file", help="The file to transmit", type=str, default="./str.txt")
 
     return parser.parse_args()
+
+
+def calculate_checksum(data: bytes) -> bytes:
+    assert len(data) == PACKET_DATA_LENGTH
+
+    return sum(byte.bit_count() for byte in data).to_bytes()
