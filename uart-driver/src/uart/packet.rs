@@ -2,8 +2,10 @@ use crate::constants::LENGTH_OF_DATA;
 use crate::uart::logger::Logger;
 use crate::uart::stats::UARTStats;
 use bitflags::bitflags;
+use log::info;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter};
+use std::io::{stdout, Write};
 use std::sync::mpsc::Receiver;
 
 #[derive(Serialize, Deserialize)]
@@ -35,7 +37,7 @@ impl Packet {
         self.errors.is_empty()
     }
 
-    pub fn from_bytes(seq_num: u8, last_seq_num: u8, checksum: u8, data: [u8; LENGTH_OF_DATA], stats: Vec<UARTStats>) -> Self {
+    pub fn new(seq_num: u8, last_seq_num: u8, checksum: u8, data: [u8; LENGTH_OF_DATA], stats: Vec<UARTStats>) -> Self {
         let mut errors = PacketErrors::empty();
 
         let expected_checksum = calculate_checksum(data);
@@ -61,6 +63,9 @@ impl Packet {
 pub fn decode_packets(tx: Receiver<(u8, Option<UARTStats>)>, packets: &mut Vec<Packet>, logger: &mut Logger) -> ! {
     let mut last_seq_num: u8 = 255;
 
+    info!("Going into infinite listen!");
+    stdout().flush().unwrap();
+
     loop {
         let mut all_stats = Vec::new();
         macro_rules! get_byte {
@@ -76,6 +81,7 @@ pub fn decode_packets(tx: Receiver<(u8, Option<UARTStats>)>, packets: &mut Vec<P
         }
 
         let seq_num = get_byte!();
+        // TODO: If the seq_num doesn't match, try reinterpreting the packet with a byte offset and see if it makes a difference
         let checksum = get_byte!();
 
         let mut data = [0; LENGTH_OF_DATA];
@@ -83,7 +89,7 @@ pub fn decode_packets(tx: Receiver<(u8, Option<UARTStats>)>, packets: &mut Vec<P
             data[i] = get_byte!();
         }
 
-        let packet = Packet::from_bytes(seq_num, last_seq_num, checksum, data, all_stats);
+        let packet = Packet::new(seq_num, last_seq_num, checksum, data, all_stats);
         logger.log_packet(&packet);
 
         if packet.is_valid() {

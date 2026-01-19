@@ -4,13 +4,11 @@ use crate::uart::uart::MiniUART;
 use std::sync::mpsc::Sender;
 use std::thread;
 use std::thread::JoinHandle;
-use uio::UioDevice;
 
 pub mod cli;
 pub mod constants;
 pub mod uart;
 
-use crate::cli::Cli;
 use crate::uart::stats::UARTStats;
 use mutually_exclusive_features::exactly_one_of;
 
@@ -24,22 +22,13 @@ compile_error!("With polling enabled, the io_scratch feature isn't usable");
 /// Any shared startup code should thus be located or called from here.
 ///
 /// The `.init()` will be called from here.
-pub fn init_uart(baudrate: u32) -> MiniUART {
+pub fn init_logging() {
     pretty_env_logger::init();
-
-    let dev = UioDevice::try_new(0).unwrap();
-    let mut uart = MiniUART::from_uio(dev);
-    uart.init(baudrate).unwrap();
-
-    uart
 }
 
-
-pub fn spawn_uart_thread(tx: Sender<(u8, Option<UARTStats>)>, cli: &Cli) -> JoinHandle<()> {
-    let baud = cli.baudrate;
-
+pub fn spawn_uart_thread(tx: Sender<(u8, Option<UARTStats>)>, baudrate: u32) -> JoinHandle<()> {
     thread::spawn(move || {
-        let mut uart = init_uart(baud);
+        let mut uart = MiniUART::new(baudrate);
 
         loop {
             let data = uart.get_byte();

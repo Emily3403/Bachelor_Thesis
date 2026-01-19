@@ -7,12 +7,6 @@ pub struct MiniUART {
     pub uio: UioDevice,
 }
 
-impl MiniUART {
-    pub fn get_stats(&self) -> UARTStats {
-        self.regs.read_stats()
-    }
-}
-
 /// Private API
 impl MiniUART {
     #[cfg(feature = "driver_irq")]
@@ -31,15 +25,9 @@ impl MiniUART {
             }
         }
     }
-}
 
-impl MiniUART {
-    pub fn from_uio(dev: UioDevice) -> MiniUART {
-        let regs = unsafe { &mut *(dev.map_mapping(0).unwrap() as *mut MiniUartRegs) };
-        MiniUART { regs, uio: dev }
-    }
-
-    pub fn init(&mut self, baudrate: u32) -> Result<(), &'static str> {
+    /// Initializes registers of the UART and might enable interrupts
+    fn init(&mut self, baudrate: u32) -> Result<(), &'static str> {
         self.regs.init(baudrate)?;
 
         #[cfg(feature = "driver_irq")]
@@ -51,9 +39,23 @@ impl MiniUART {
 
 /// Public API
 impl MiniUART {
-    /// Get's you the next byte that is transmitted (blocking)
+    /// Creates the MiniUART Memory mapping and crashes the program if that was unsuccessful
+    pub fn new(baudrate: u32) -> MiniUART {
+        let dev = UioDevice::try_new(0).unwrap();
+        let regs = unsafe { &mut *(dev.map_mapping(0).unwrap() as *mut MiniUartRegs) };
+        let mut it = MiniUART { regs, uio: dev };
+
+        it.init(baudrate).unwrap();
+        it
+    }
+
+    /// Gets you the next byte that is transmitted (blocking)
     pub fn get_byte(&mut self) -> u8 {
         self.wait_for_byte();
         self.regs.read_byte_unchecked()
+    }
+
+    pub fn get_stats(&self) -> UARTStats {
+        self.regs.read_stats()
     }
 }
