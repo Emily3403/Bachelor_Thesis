@@ -1,7 +1,6 @@
 import os
 import re
 import subprocess
-from pathlib import Path
 
 
 def load_env(path=".envrc"):
@@ -74,8 +73,10 @@ def expand_variables(value, env):
 
     return value
 
+
 def check_ending(a: str, b: str):
     return a[-5:] == b[-5:]
+
 
 def find_nonces(it: str) -> list[str]:
     return re.findall("\|(\d+)\n", it)

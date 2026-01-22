@@ -1,7 +1,7 @@
 import itertools
 import string
 
-from test_cases import TestCase
+from src.test_cases.test_case import TestCase
 
 TEST_NAME_AND_PATTERNS = [
     ("ASCII", string.ascii_letters),

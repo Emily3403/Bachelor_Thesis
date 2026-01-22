@@ -3,8 +3,8 @@ from dataclasses import dataclass
 
 from more_itertools import consecutive_groups
 
-from test_cases import TestCase
-from utils import find_nonces
+from src.test_cases.test_case import TestCase
+from src.utils import find_nonces
 
 
 # Key Metrics:
@@ -23,8 +23,6 @@ from utils import find_nonces
 #   - Latency
 #     - New binary: recv byte → send byte
 #     → Jitter
-
-
 
 
 @dataclass

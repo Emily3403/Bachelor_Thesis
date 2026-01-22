@@ -2,19 +2,22 @@ use crate::cli::Cli;
 use crate::uart::packet::Packet;
 use crate::uart::stats::UARTStats;
 use bitflags::bitflags;
-use std::fs::{create_dir_all, File};
+use std::fs::{File, create_dir_all};
 use std::io::Write;
 
 pub struct Logger {
     pub what_to_log: LoggerType,
-    pub data_out: File,   // stdout, decoded ASCII
+
+    pub config_out: File, // Log the parameters as json
+    pub data_out:   File, // stdout, decoded ASCII
     pub packet_out: File, // Logging of the packets
 }
 
 bitflags! {
     pub struct LoggerType: u8 {
-        const DATA      = 0b0001;
-        const PACKETS   = 0b0010;
+        const CONFIG    = 0b0001;
+        const DATA      = 0b0010;
+        const PACKETS   = 0b0100;
     }
 }
 
@@ -24,8 +27,10 @@ impl LoggerType {
         if cli.loglevel == "info" {
             it.insert(LoggerType::PACKETS)
         }
+
         if cli.loglevel != "error" {
-            it.insert(LoggerType::DATA)
+            it.insert(LoggerType::CONFIG);
+            it.insert(LoggerType::DATA);
         }
 
         it
@@ -35,14 +40,21 @@ impl LoggerType {
 impl Logger {
     pub fn new(cli: &Cli) -> Logger {
         create_dir_all(&cli.savedir).unwrap();
+        let config_out = File::create(cli.savedir.join("config")).unwrap();
         let data_out = File::create(cli.savedir.join("stdout")).unwrap();
         let packet_out = File::create(cli.savedir.join("packets.log")).unwrap();
 
         Self {
             what_to_log: LoggerType::from_cli(cli),
+
+            config_out,
             data_out,
             packet_out,
         }
+    }
+
+    pub fn log_config(&mut self, cli: &Cli) {
+        todo!()
     }
 
     pub fn log_byte(&mut self, b: u8, _stats: &Option<UARTStats>) {
