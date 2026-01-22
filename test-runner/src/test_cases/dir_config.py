@@ -21,18 +21,18 @@ class DirConfig:
         """Absolute Path on the Local System"""
         return WORKING_DIR / self._main_data_dir / str(test.iteration) / test.test_name / str(test.baudrate)
 
-    def localhost_stdin(self, test: TestCase) -> Path:
+    def localhost_stdin_file(self, test: TestCase) -> Path:
         return self.localhost_base(test) / self._data_in
 
-    # Where all the output of *this* TestCase resides
-    def localhost_stdout(self, test: TestCase) -> Path:
+    def localhost_output(self, test: TestCase) -> Path:
+        """Where all the output of *this* TestCase resides"""
         return self.localhost_base(test) / test.just_command
 
-    def localhost_data_file(self, test: TestCase) -> Path:
-        return self.localhost_stdout(test) / self._data_out
+    def localhost_stdout_file(self, test: TestCase) -> Path:
+        return self.localhost_output(test) / self._data_out
 
     def localhost_packet_file(self, test: TestCase) -> Path:
-        return self.localhost_stdout(test) / self._packet_out
+        return self.localhost_output(test) / self._packet_out
 
     # === Raspi ===
     def raspi_base(self, test: TestCase) -> Path:
@@ -42,8 +42,12 @@ class DirConfig:
     def raspi_stdin(self, test: TestCase) -> Path:
         return self.raspi_base(test) / self._data_in
 
-    def raspi_stdout(self, test: TestCase) -> Path:
+    def raspi_output(self, test: TestCase) -> Path:
+        """Where all the output of *this* TestCase resides"""
         return self.raspi_base(test) / test.just_command
+
+    def raspi_stdout(self, test: TestCase) -> Path:
+        return self.raspi_output(test) / self._data_out
 
 
 DIR_CONFIG = DirConfig()

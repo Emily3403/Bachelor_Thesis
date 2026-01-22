@@ -26,11 +26,11 @@ class TestCase:
     send_command: None | Popen = None
 
     def setup(self) -> None:
-        os.makedirs(DIR_CONFIG.localhost_stdout(self), exist_ok=True)
+        os.makedirs(DIR_CONFIG.localhost_output(self), exist_ok=True)
         self.generate_stdin_file()
 
     def run(self, env: dict[Any, Any]) -> None:
-        if CACHE_RESULTS and DIR_CONFIG.localhost_data_file(self).exists():
+        if CACHE_RESULTS and DIR_CONFIG.localhost_stdout_file(self).exists():
             print(f"Skipped TestCase {self}")
             return
 
@@ -76,7 +76,7 @@ class TestCase:
             os.system("ssh $RASPI_CUSTOM_KERNEL_HOST 'kill $(lsof -t /dev/uio0) || true &> /dev/null'")
 
     def get_results(self, env: dict[Any, Any]) -> bool:
-        return Popen(["rsync", "-a", f"$RASPI_CUSTOM_KERNEL_HOST:{DIR_CONFIG.raspi_stdout(self)}/", f"{DIR_CONFIG.localhost_stdout(self)}/"], env=env).wait() == 0
+        return Popen(["rsync", "-a", f"$RASPI_CUSTOM_KERNEL_HOST:{DIR_CONFIG.raspi_output(self)}/", f"{DIR_CONFIG.localhost_output(self)}/"], env=env).wait() == 0
 
     # === Utils ===
     def popen_just(self, env: dict[Any, Any], command: str) -> Popen:
@@ -100,7 +100,7 @@ class TestCase:
 
     def generate_stdin_file(self) -> None:
         """Generates a file with a certain length, depending on the baudrate"""
-        path = DIR_CONFIG.localhost_stdin(self)
+        path = DIR_CONFIG.localhost_stdin_file(self)
         if path.exists():
             return
 

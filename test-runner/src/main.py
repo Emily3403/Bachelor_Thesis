@@ -9,8 +9,11 @@ def main() -> None:
     env = load_env()
     print(f"Testing {len(TESTCASES)} items...")
 
+    # We only ever want to execute testcases sequentially because there is only one hardware device. Run them all first as fast as possible though
     for testcase in TESTCASES:
         testcase.run(env)
+
+    for testcase in TESTCASES:
         analyze_testcase(testcase)
         export_testcase_data(testcase)
 

@@ -4,8 +4,8 @@ from src.test_cases.test_case import TestCase
 
 
 def analyze_testcase(it: TestCase) -> None:
-    stdin = DIR_CONFIG.localhost_stdin(it).read_text()
-    stdout_path = DIR_CONFIG.localhost_stdout(it)
+    stdin = DIR_CONFIG.localhost_stdin_file(it).read_text()
+    stdout_path = DIR_CONFIG.localhost_output(it)
 
     try:
         stdout = stdout_path.read_text()
