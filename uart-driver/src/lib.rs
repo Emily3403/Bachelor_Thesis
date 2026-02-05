@@ -1,3 +1,4 @@
+#![feature(mpmc_channel)]
 extern crate core;
 
 use crate::uart::uart::MiniUART;
@@ -7,9 +8,10 @@ use std::thread::JoinHandle;
 
 pub mod cli;
 pub mod constants;
+pub mod logger;
 pub mod uart;
 
-use crate::uart::stats::UARTStats;
+use crate::logger::LogSender;
 use mutually_exclusive_features::exactly_one_of;
 
 exactly_one_of!("driver_irq", "driver_polling");
@@ -26,14 +28,16 @@ pub fn init_logging() {
     pretty_env_logger::init();
 }
 
-pub fn spawn_uart_thread(tx: Sender<(u8, Option<UARTStats>)>, baudrate: u32) -> JoinHandle<()> {
+pub fn spawn_uart_thread(tx: Sender<u8>, baudrate: u32, mut logger: LogSender) -> JoinHandle<()> {
     thread::spawn(move || {
         let mut uart = MiniUART::new(baudrate);
 
         loop {
             let data = uart.get_byte();
             let stats = uart.get_stats();
-            tx.send((data, Some(stats))).unwrap();
+            logger.log_byte(data, &stats);
+
+            tx.send(data).unwrap();
         }
     })
 }

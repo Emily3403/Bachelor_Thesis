@@ -1,6 +1,5 @@
 use crate::constants::LENGTH_OF_DATA;
-use crate::uart::logger::Logger;
-use crate::uart::stats::UARTStats;
+use crate::logger::{LogSender};
 use bitflags::bitflags;
 use log::info;
 use serde::{Deserialize, Serialize};
@@ -14,7 +13,6 @@ pub struct Packet {
     pub checksum: u8, // Pop count, only over [data]
     pub data: [u8; LENGTH_OF_DATA],
 
-    pub stats: Vec<UARTStats>,
     pub errors: PacketErrors,
 }
 
@@ -37,7 +35,7 @@ impl Packet {
         self.errors.is_empty()
     }
 
-    pub fn new(seq_num: u8, last_seq_num: u8, checksum: u8, data: [u8; LENGTH_OF_DATA], stats: Vec<UARTStats>) -> Self {
+    pub fn new(seq_num: u8, last_seq_num: u8, checksum: u8, data: [u8; LENGTH_OF_DATA]) -> Self {
         let mut errors = PacketErrors::empty();
 
         let expected_checksum = calculate_checksum(data);
@@ -54,42 +52,28 @@ impl Packet {
             seq_num,
             checksum,
             data,
-            stats,
             errors: PacketErrors::empty(),
         }
     }
 }
 
-pub fn decode_packets(tx: Receiver<(u8, Option<UARTStats>)>, packets: &mut Vec<Packet>, logger: &mut Logger) -> ! {
+pub fn decode_packets(tx: Receiver<u8>, packets: &mut Vec<Packet>, mut logger: LogSender) -> ! {
     let mut last_seq_num: u8 = 255;
 
     info!("Going into infinite listen!");
     stdout().flush().unwrap();
 
     loop {
-        let mut all_stats = Vec::new();
-        macro_rules! get_byte {
-            () => {{
-                let (data, stats) = tx.recv().unwrap();
-                logger.log_byte(data, &stats);
-
-                if let Some(it) = stats {
-                    all_stats.push(it);
-                }
-                data
-            }};
-        }
-
-        let seq_num = get_byte!();
+        let seq_num = tx.recv().unwrap();
         // TODO: If the seq_num doesn't match, try reinterpreting the packet with a byte offset and see if it makes a difference
-        let checksum = get_byte!();
+        let checksum = tx.recv().unwrap();
 
         let mut data = [0; LENGTH_OF_DATA];
         for i in 0..LENGTH_OF_DATA {
-            data[i] = get_byte!();
+            data[i] = tx.recv().unwrap();
         }
 
-        let packet = Packet::new(seq_num, last_seq_num, checksum, data, all_stats);
+        let packet = Packet::new(seq_num, last_seq_num, checksum, data);
         logger.log_packet(&packet);
 
         if packet.is_valid() {

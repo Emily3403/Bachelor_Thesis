@@ -55,7 +55,13 @@ impl MiniUART {
         self.regs.read_byte_unchecked()
     }
 
-    pub fn get_stats(&self) -> UARTStats {
+
+    pub fn _get_stats(&self) -> UARTStats {
         self.regs.read_stats()
+    }
+
+    /// "Real" Method that might do subsampling of uart stats
+    pub fn get_stats(&self) -> Option<UARTStats> {
+        Some(self._get_stats())
     }
 }
