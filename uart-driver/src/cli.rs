@@ -15,6 +15,9 @@ pub struct Cli {
     /// Error logs nothing except errors, no data
     #[arg(long, default_value = "info", value_parser=parse_loglevel)]
     pub loglevel: String,
+
+    #[arg(long, default_value = "1")]
+    pub num_data_bytes: usize,
 }
 
 pub fn parse_loglevel(level: &str) -> Result<String, String> {

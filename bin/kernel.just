@@ -27,11 +27,11 @@ kernel-deploy: kernel-build
 [working-directory("/home/emily/Documents/Uni/Study/Bachelor-Thesis")]
 kernel-listen:
     rsync -a "uart-driver/kernel-driver/" $RASPI_STOCK_KERNEL_HOST:kernel-driver/ --exclude=venv
-    ssh -t $RASPI_STOCK_KERNEL_HOST "./kernel-driver/listen.py"
+    ssh -t $RASPI_STOCK_KERNEL_HOST "./kernel-driver/listen.py -b '{{ baudrate }}' --num-data-bytes '{{ num-data-bytes }}'"
 
 # Runs `send` with the kernel driver (b2)
 [group("Kernel")]
 [working-directory("/home/emily/Documents/Uni/Study/Bachelor-Thesis")]
 kernel-send:
     rsync -aL "uart-driver/kernel-driver/" $RASPI_STOCK_KERNEL_HOST:kernel-driver/ --exclude=venv
-    ssh $RASPI_STOCK_KERNEL_HOST "cd kernel-driver; ./send.py -b '{{ baudrate }}' -f '{{ send-file }}'"
+    ssh $RASPI_STOCK_KERNEL_HOST "cd kernel-driver; ./send.py -b '{{ baudrate }}' -f '{{ send-file }}' --num-data-bytes '{{ num-data-bytes }}'"

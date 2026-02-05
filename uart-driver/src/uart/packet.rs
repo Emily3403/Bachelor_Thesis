@@ -1,4 +1,3 @@
-use crate::constants::LENGTH_OF_DATA;
 use crate::logger::{LogSender};
 use bitflags::bitflags;
 use log::info;
@@ -6,12 +5,13 @@ use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter};
 use std::io::{stdout, Write};
 use std::sync::mpsc::Receiver;
+use crate::cli::Cli;
 
 #[derive(Serialize, Deserialize)]
 pub struct Packet {
     pub seq_num: u8,
     pub checksum: u8, // Pop count, only over [data]
-    pub data: [u8; LENGTH_OF_DATA],
+    pub data: Vec<u8>,  // TODO: Benchmark if Vec is a Performance Bottleneck
 
     pub errors: PacketErrors,
 }
@@ -35,10 +35,10 @@ impl Packet {
         self.errors.is_empty()
     }
 
-    pub fn new(seq_num: u8, last_seq_num: u8, checksum: u8, data: [u8; LENGTH_OF_DATA]) -> Self {
+    pub fn new(seq_num: u8, last_seq_num: u8, checksum: u8, data: Vec<u8>) -> Self {
         let mut errors = PacketErrors::empty();
 
-        let expected_checksum = calculate_checksum(data);
+        let expected_checksum = calculate_checksum(&data);
         if expected_checksum != checksum {
             errors.insert(PacketErrors::CHECKSUM_MISMATCH)
         }
@@ -57,7 +57,7 @@ impl Packet {
     }
 }
 
-pub fn decode_packets(tx: Receiver<u8>, packets: &mut Vec<Packet>, mut logger: LogSender) -> ! {
+pub fn decode_packets(tx: Receiver<u8>, packets: &mut Vec<Packet>, mut logger: LogSender, cli: &Cli) -> ! {
     let mut last_seq_num: u8 = 255;
 
     info!("Going into infinite listen!");
@@ -68,8 +68,8 @@ pub fn decode_packets(tx: Receiver<u8>, packets: &mut Vec<Packet>, mut logger: L
         // TODO: If the seq_num doesn't match, try reinterpreting the packet with a byte offset and see if it makes a difference
         let checksum = tx.recv().unwrap();
 
-        let mut data = [0; LENGTH_OF_DATA];
-        for i in 0..LENGTH_OF_DATA {
+        let mut data = Vec::new();
+        for i in 0..cli.num_data_bytes {
             data[i] = tx.recv().unwrap();
         }
 
@@ -83,6 +83,6 @@ pub fn decode_packets(tx: Receiver<u8>, packets: &mut Vec<Packet>, mut logger: L
     }
 }
 
-pub fn calculate_checksum(data: [u8; LENGTH_OF_DATA]) -> u8 {
+pub fn calculate_checksum(data: &Vec<u8>) -> u8 {
     data.iter().map(|d| d.count_ones() as u8).sum()
 }

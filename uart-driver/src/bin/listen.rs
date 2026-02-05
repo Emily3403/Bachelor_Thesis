@@ -17,5 +17,5 @@ pub fn main() {
     let _uart_thread = spawn_uart_thread(uart_tx, cli.baudrate, logger.new_sender());
 
     let mut packets = Vec::new();
-    decode_packets(uart_rx, &mut packets, logger.new_sender());
+    decode_packets(uart_rx, &mut packets, logger.new_sender(), &cli);
 }
