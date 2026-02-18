@@ -1,7 +1,8 @@
 use crate::cli::Cli;
-use crate::log_packet;
-use crate::logger;
-use crate::logger::LOGGER;
+use crate::log;
+use crate::logger::time::get_time;
+use crate::Loggable;
+use crate::LOGGER;
 use bitflags::bitflags;
 use log::info;
 use serde::{Deserialize, Serialize};
@@ -12,8 +13,8 @@ use std::sync::mpsc::Receiver;
 #[derive(Serialize, Deserialize)]
 pub struct Packet {
     pub seq_num: u8,
-    pub checksum: u8, // Pop count, only over [data]
-    pub data: Vec<u8>,  // TODO: Benchmark if Vec is a Performance Bottleneck
+    pub checksum: u8,  // Pop count, only over [data]
+    pub data: Vec<u8>, // TODO: Benchmark if Vec is a Performance Bottleneck
 
     pub errors: PacketErrors,
 }
@@ -50,12 +51,7 @@ impl Packet {
             errors.insert(PacketErrors::SEQNUM_MISMATCH)
         }
 
-        Packet {
-            seq_num,
-            checksum,
-            data,
-            errors: PacketErrors::empty(),
-        }
+        Packet { seq_num, checksum, data, errors: PacketErrors::empty() }
     }
 }
 
@@ -71,12 +67,12 @@ pub fn main_thread_decode_packets(tx: Receiver<u8>, packets: &mut Vec<Packet>, c
         let checksum = tx.recv().unwrap();
 
         let mut data = Vec::new();
-        for i in 0..cli.num_data_bytes {
-            data[i] = tx.recv().unwrap();
+        for _ in 0..cli.num_data_bytes {
+            data.push(tx.recv().unwrap());
         }
 
         let packet = Packet::new(seq_num, last_seq_num, checksum, data);
-        // log_packet!(&packet);
+        log!(&packet, get_time());
 
         if packet.is_valid() {
             last_seq_num = last_seq_num.wrapping_add(1);

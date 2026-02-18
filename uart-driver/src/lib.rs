@@ -1,4 +1,7 @@
+use crate::logger::loggable::Loggable;
+use crate::logger::thread_local::LOGGER;
 use crate::uart::uart::MiniUART;
+use clap::Parser;
 use std::sync::mpsc::Sender;
 use std::thread;
 use std::thread::JoinHandle;
@@ -9,7 +12,7 @@ pub mod logger;
 pub mod uart;
 
 use crate::cli::Cli;
-use crate::logger::LOGGER;
+use crate::logger::time::get_time;
 use mutually_exclusive_features::exactly_one_of;
 
 exactly_one_of!("driver_irq", "driver_polling");
@@ -18,9 +21,9 @@ exactly_one_of!("io_data", "io_scratch");
 #[cfg(all(feature = "driver_polling", feature = "io_scratch"))]
 compile_error!("With polling enabled, the io_scratch feature isn't usable");
 
-pub fn init_logging(cli: &Cli) {
+pub fn init_logging() {
     pretty_env_logger::init();
-    log_config!(cli)
+    log!(Cli::parse(), get_time())
 }
 
 pub fn spawn_uart_thread(tx: Sender<u8>, baudrate: u32) -> JoinHandle<()> {
@@ -33,7 +36,8 @@ pub fn spawn_uart_thread(tx: Sender<u8>, baudrate: u32) -> JoinHandle<()> {
 
             // TODO: Does the order of these operations matter?
             tx.send(data).unwrap();
-            log_byte!(data, &stats)
+            log!(data, time);
+            log!((stats, i_count), time);
         }
     })
 }

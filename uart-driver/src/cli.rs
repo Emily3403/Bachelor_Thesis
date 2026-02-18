@@ -1,8 +1,9 @@
 use clap::Parser;
+use serde::{Deserialize, Serialize};
 use std::env;
 use std::path::PathBuf;
 
-#[derive(Parser, Debug)]
+#[derive(Parser, Debug, Serialize, Deserialize)]
 #[command(version, about, long_about = None)]
 pub struct Cli {
     #[arg(short, long, default_value = "9600")]

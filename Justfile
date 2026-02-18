@@ -4,7 +4,7 @@ set dotenv-path := "./.envrc"
 realtime := "false"
 baudrate := "500000"
 send-file := "./str.txt"
-save-dir := "None"
+save-dir := "local-results"
 num-data-bytes := "2"  # TODO
 
 

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import sys
 from argparse import Namespace, ArgumentParser
 from typing import Literal
@@ -11,6 +13,7 @@ def parse_args() -> Namespace:
 
     parser.add_argument("-b", "--baudrate", help="The baudrate", type=int, default=9600)
     parser.add_argument("-f", "--file", help="The file to transmit", type=str, default="./str.txt")
+    parser.add_argument("--num-data-bytes", help="Number of data bytes", type=int, default=1)
 
     return parser.parse_args()
 

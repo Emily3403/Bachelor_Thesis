@@ -8,7 +8,7 @@ use uart_lib::{init_logging, spawn_uart_thread};
 
 pub fn main() {
     let cli = Cli::parse();
-    init_logging(&cli);
+    init_logging();
 
     let mut packets = Vec::new();
     let (tx, rx) = channel();

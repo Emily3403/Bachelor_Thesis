@@ -1,6 +1,7 @@
 use crate::cli::Cli;
-use crate::logger::{LogReceiver, Logger, LoggerType};
+use crate::logger::{LogMessageType, LogReceiver, Logger, LoggerType};
 use std::fs::{create_dir_all, File};
+use std::io::{BufWriter, Write};
 use std::sync::mpsc::channel;
 
 /// Contains all configuration and Ownership of Logger (for a single thread)
@@ -22,28 +23,42 @@ impl LoggerType {
 }
 
 impl LogReceiver {
-    pub fn do_logging(self) -> ! {
+    pub fn do_logging(mut self) -> ! {
         loop {
-            let it = self.rx.recv();
+            let (msg, typ, time) = self.rx.recv().unwrap();
+            let file = typ.decide_file(&mut self);
+
+            match typ {
+                LogMessageType::Data => write!(file, "{}", msg),
+                _ => writeln!(file, "{} | {}", time, msg),
+            }
+            .expect("Log Writing Failed!");
+            // TODO: Not every time
+            file.flush().expect("flush failed");
         }
     }
 
     /// Opens files for logging and saves it all to `Self`
     pub fn new(cli: &Cli) -> (LogReceiver, Logger) {
+        macro_rules! create_file {
+            ($it: expr) => {
+                BufWriter::new(File::create(cli.savedir.join($it)).unwrap())
+            };
+        }
+
         create_dir_all(&cli.savedir).unwrap();
-        let config_out = File::create(cli.savedir.join("config")).unwrap();
-        let data_out = File::create(cli.savedir.join("stdout")).unwrap();
-        let packet_out = File::create(cli.savedir.join("packets.log")).unwrap();
         let (tx, rx) = channel();
 
         let receiver = Self {
             what_to_log: LoggerType::from_cli(cli),
             rx,
 
-            config_out,
-            data_out,
-            packet_out,
+            config_out: create_file!("config"),
+            data_out: create_file!("stdout"),
+            packet_out: create_file!("packets.log"),
+            stat_out: create_file!("stats.log"),
         };
+
         let logger = Logger { tx };
 
         (receiver, logger)
