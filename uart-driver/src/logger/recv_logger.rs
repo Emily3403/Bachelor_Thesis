@@ -1,7 +1,7 @@
 use crate::cli::Cli;
-use crate::logger::{LogReceiver, LogSender, LoggerType};
+use crate::logger::{LogReceiver, Logger, LoggerType};
 use std::fs::{create_dir_all, File};
-use std::sync::mpmc::channel;
+use std::sync::mpsc::channel;
 
 /// Contains all configuration and Ownership of Logger (for a single thread)
 
@@ -22,28 +22,30 @@ impl LoggerType {
 }
 
 impl LogReceiver {
-    // TODO: Should actually spawn the thread
-    pub fn new(cli: &Cli) -> LogReceiver {
+    pub fn do_logging(self) -> ! {
+        loop {
+            let it = self.rx.recv();
+        }
+    }
+
+    /// Opens files for logging and saves it all to `Self`
+    pub fn new(cli: &Cli) -> (LogReceiver, Logger) {
         create_dir_all(&cli.savedir).unwrap();
         let config_out = File::create(cli.savedir.join("config")).unwrap();
         let data_out = File::create(cli.savedir.join("stdout")).unwrap();
         let packet_out = File::create(cli.savedir.join("packets.log")).unwrap();
         let (tx, rx) = channel();
 
-        Self {
+        let receiver = Self {
             what_to_log: LoggerType::from_cli(cli),
             rx,
-            tx,
 
             config_out,
             data_out,
             packet_out,
-        }
-    }
+        };
+        let logger = Logger { tx };
 
-    pub fn new_sender(&self) -> LogSender {
-        LogSender {
-            tx: self.tx.clone()
-        }
+        (receiver, logger)
     }
 }

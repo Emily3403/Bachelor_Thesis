@@ -1,3 +1,5 @@
+use crate::logger::time::get_time;
+use crate::logger::{InterruptCount, TimeStamp};
 use crate::uart::registers::MiniUartRegs;
 use crate::uart::stats::UARTStats;
 use uio::UioDevice;
@@ -10,15 +12,15 @@ pub struct MiniUART {
 /// Private API
 impl MiniUART {
     #[cfg(feature = "driver_irq")]
-    fn wait_for_byte(&mut self) {
+    fn wait_for_byte(&mut self) -> (InterruptCount, TimeStamp) {
         #[cfg(feature = "io_data")]
         self.uio.irq_enable().unwrap();
 
-        let _total_interrupts = self.uio.irq_wait();
+        (self.uio.irq_wait().unwrap(), get_time())
     }
 
     #[cfg(feature = "driver_polling")]
-    fn wait_for_byte(&mut self) {
+    fn wait_for_byte(&mut self) -> TimeStamp {
         loop {
             if self.regs.rx_byte_ready() {
                 break;
@@ -49,12 +51,13 @@ impl MiniUART {
         it
     }
 
-    /// Gets you the next byte that is transmitted (blocking)
-    pub fn get_byte(&mut self) -> u8 {
-        self.wait_for_byte();
-        self.regs.read_byte_unchecked()
-    }
+    /// Gets you the next byte that is transmitted (blocking) together with the timestamp that it was taken
+    pub fn get_byte(&mut self) -> (u8, InterruptCount, TimeStamp) {
+        let (i_count, time) = self.wait_for_byte();
+        let data = self.regs.read_byte_unchecked();
 
+        (data, i_count, time)
+    }
 
     pub fn _get_stats(&self) -> UARTStats {
         self.regs.read_stats()

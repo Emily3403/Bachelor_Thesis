@@ -1,25 +1,19 @@
 use crate::cli::Cli;
-use crate::logger::{LogReceiver, LogSender};
+use crate::logger::Logger;
 use crate::uart::packet::Packet;
 use crate::uart::stats::UARTStats;
 
-impl LogSender {
-    pub fn from_receiver(recv: &LogReceiver) -> Self {
-        Self {
-            tx: recv.tx.clone(),
-        }
-    }
-
-    pub fn log_config(&mut self, cli: &Cli) {
+impl Logger {
+    pub fn log_config(&self, cli: &Cli) {
         todo!()
     }
 
-    pub fn log_byte(&mut self, b: u8, _stats: &Option<UARTStats>) {
+    pub fn log_byte(&self, b: u8, _stats: &Option<UARTStats>) {
         todo!();
         // self.data_out.write_all(&[b]).unwrap()
     }
 
-    pub fn log_packet(&mut self, packet: &Packet) {
+    pub fn log_packet(&self, packet: &Packet) {
         todo!()
         // self.packet_out.write_all(format!("{packet}\n").as_bytes()).unwrap();
     }

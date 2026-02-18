@@ -1,11 +1,13 @@
-use crate::logger::{LogSender};
+use crate::cli::Cli;
+use crate::log_packet;
+use crate::logger;
+use crate::logger::LOGGER;
 use bitflags::bitflags;
 use log::info;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter};
 use std::io::{stdout, Write};
 use std::sync::mpsc::Receiver;
-use crate::cli::Cli;
 
 #[derive(Serialize, Deserialize)]
 pub struct Packet {
@@ -57,7 +59,7 @@ impl Packet {
     }
 }
 
-pub fn decode_packets(tx: Receiver<u8>, packets: &mut Vec<Packet>, mut logger: LogSender, cli: &Cli) -> ! {
+pub fn main_thread_decode_packets(tx: Receiver<u8>, packets: &mut Vec<Packet>, cli: &Cli) -> ! {
     let mut last_seq_num: u8 = 255;
 
     info!("Going into infinite listen!");
@@ -74,7 +76,7 @@ pub fn decode_packets(tx: Receiver<u8>, packets: &mut Vec<Packet>, mut logger: L
         }
 
         let packet = Packet::new(seq_num, last_seq_num, checksum, data);
-        logger.log_packet(&packet);
+        // log_packet!(&packet);
 
         if packet.is_valid() {
             last_seq_num = last_seq_num.wrapping_add(1);

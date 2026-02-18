@@ -17,7 +17,7 @@ register_bitfields! {
     // Interrupt Identify
     IIR [
         ID OFFSET(2) NUMBITS(2) [
-            // TODO: How to express better in tock_registers
+            // TODO: How to express better in tock_registers?
             None = 0b00,
             TX = 0b01,
             RX = 0b10,
