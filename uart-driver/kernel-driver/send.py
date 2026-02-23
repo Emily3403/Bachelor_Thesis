@@ -2,7 +2,6 @@
 from argparse import Namespace
 from itertools import batched
 from pathlib import Path
-
 from serial import Serial
 
 from utils import parse_args, calculate_checksum, BYTEORDER, PACKET_DATA_LENGTH
@@ -15,8 +14,8 @@ def write_serial(ser: Serial, s: str):
         data_to_send = bytes(data)
 
         ser.write((i % 255).to_bytes(1, BYTEORDER))  # seq_num
-        ser.write(calculate_checksum(data_to_send))         # checksum
-        ser.write(data_to_send)                             # data
+        ser.write(calculate_checksum(data_to_send))  # checksum
+        ser.write(data_to_send)  # data
 
     ser.flush()
     print(f"Sent: {i * (2 + PACKET_DATA_LENGTH)} bytes")

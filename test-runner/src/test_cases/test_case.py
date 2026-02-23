@@ -14,6 +14,7 @@ class TestCase:
     An Instance of a TestCase, having all the information needed for executing it
     """
     iteration: int
+    number: int  # Number in the global list of TESTCASES
     test_name: str
     test_pattern: str
 
@@ -25,26 +26,26 @@ class TestCase:
     listen_command: None | Popen = None
     send_command: None | Popen = None
 
-    def setup(self) -> None:
+    def setup(self, env: dict[Any, Any]) -> bool:
         os.makedirs(DIR_CONFIG.localhost_output(self), exist_ok=True)
         self.generate_stdin_file()
+
+        return self.setup_raspi(env)
 
     def run(self, env: dict[Any, Any]) -> None:
         if CACHE_RESULTS and DIR_CONFIG.localhost_stdout_file(self).exists():
             print(f"Skipped TestCase {self}")
             return
 
-        self.setup()
-        self.spawn_listen_command(env)
+        self.setup(env)
+        self.spawn_and_wait_listen_command(env)
         self.send_string(env)
-        self.kill_listen()
+        self.kill_listen_command()
         self.get_results(env)
 
-    def spawn_listen_command(self, env: dict[Any, Any]) -> None:
+    def spawn_and_wait_listen_command(self, env: dict[Any, Any]) -> None:
+        # TODO: This implementation of waiting for listen is suboptimal
         self.listen_command = self.popen_just(env, self.just_command)
-
-        if self.listen_command.stderr is None:
-            return None
 
         output = []
         while True:
@@ -71,9 +72,12 @@ class TestCase:
 
         print("Done!")
 
-    def kill_listen(self) -> None:
+    def kill_listen_command(self) -> None:
         if self.listen_command:
             os.system("ssh $RASPI_CUSTOM_KERNEL_HOST 'kill $(lsof -t /dev/uio0) || true &> /dev/null'")
+
+    def setup_raspi(self, env: dict[Any, Any]) -> bool:
+        return Popen(["rsync", "-a", f"{DIR_CONFIG.localhost_output(self)}/", f"$RASPI_CUSTOM_KERNEL_HOST:{DIR_CONFIG.raspi_output(self)}/", ], env=env).wait() == 0
 
     def get_results(self, env: dict[Any, Any]) -> bool:
         return Popen(["rsync", "-a", f"$RASPI_CUSTOM_KERNEL_HOST:{DIR_CONFIG.raspi_output(self)}/", f"{DIR_CONFIG.localhost_output(self)}/"], env=env).wait() == 0

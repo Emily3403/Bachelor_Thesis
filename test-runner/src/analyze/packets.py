@@ -45,4 +45,3 @@ class UARTStats:
 class PacketErrors(Enum):
     CHECKSUM_MISMATCH = 0b0001
     SEQNUM_MISMATCH = 0b0010
-

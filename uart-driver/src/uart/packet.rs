@@ -1,6 +1,6 @@
 use crate::cli::Cli;
 use crate::log;
-use crate::logger::time::get_time;
+use crate::logger::get_time;
 use crate::Loggable;
 use crate::LOGGER;
 use bitflags::bitflags;
@@ -13,8 +13,8 @@ use std::sync::mpsc::Receiver;
 #[derive(Serialize, Deserialize)]
 pub struct Packet {
     pub seq_num: u8,
-    pub checksum: u8,  // Pop count, only over [data]
-    pub data: Vec<u8>, // TODO: Benchmark if Vec is a Performance Bottleneck
+    pub checksum: u8, // Pop count, only over [data]
+    pub data: Vec<u8>,
 
     pub errors: PacketErrors,
 }
@@ -51,7 +51,12 @@ impl Packet {
             errors.insert(PacketErrors::SEQNUM_MISMATCH)
         }
 
-        Packet { seq_num, checksum, data, errors: PacketErrors::empty() }
+        Packet {
+            seq_num,
+            checksum,
+            data,
+            errors: PacketErrors::empty(),
+        }
     }
 }
 

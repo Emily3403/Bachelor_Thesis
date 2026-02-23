@@ -14,5 +14,6 @@ def read_indefinitely():
             except Exception:
                 print("Decoding failed!")
 
+
 if __name__ == "__main__":
     read_indefinitely()

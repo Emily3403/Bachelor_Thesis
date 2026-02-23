@@ -23,6 +23,7 @@ ITERATION = 0
 TESTCASES = [
     TestCase(
         iteration=ITERATION,
+        number=i,
         test_name=name,
         test_pattern=pattern,
         just_command=command,
@@ -30,5 +31,5 @@ TESTCASES = [
         realtime=rt,
         packet_num_data_bytes=pndb,
     )
-    for (name, pattern), baud, command, rt, pndb in itertools.product(TEST_NAME_AND_PATTERNS, BAUDRATES, JUST_COMMANDS, REALTIME, PACKET_NUM_DATA_BYTES)
+    for i, ((name, pattern), baud, command, rt, pndb) in enumerate(itertools.product(TEST_NAME_AND_PATTERNS, BAUDRATES, JUST_COMMANDS, REALTIME, PACKET_NUM_DATA_BYTES))
 ]

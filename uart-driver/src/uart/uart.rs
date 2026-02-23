@@ -1,5 +1,4 @@
-use crate::logger::time::get_time;
-use crate::logger::{InterruptCount, TimeStamp};
+use crate::logger::{get_time, InterruptCount, TimeStamp};
 use crate::uart::registers::MiniUartRegs;
 use crate::uart::stats::UARTStats;
 use uio::UioDevice;

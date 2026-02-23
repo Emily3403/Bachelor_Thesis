@@ -1,7 +1,7 @@
 use crate::cli::Cli;
 use crate::logger::{LogMessageType, LogReceiver, Logger, LoggerType};
 use std::fs::{create_dir_all, File};
-use std::io::{BufWriter, Write};
+use std::io::Write;
 use std::sync::mpsc::channel;
 
 /// Contains all configuration and Ownership of Logger (for a single thread)
@@ -32,9 +32,7 @@ impl LogReceiver {
                 LogMessageType::Data => write!(file, "{}", msg),
                 _ => writeln!(file, "{} | {}", time, msg),
             }
-            .expect("Log Writing Failed!");
-            // TODO: Not every time
-            file.flush().expect("flush failed");
+                .expect("Log Writing Failed!");
         }
     }
 
@@ -42,7 +40,7 @@ impl LogReceiver {
     pub fn new(cli: &Cli) -> (LogReceiver, Logger) {
         macro_rules! create_file {
             ($it: expr) => {
-                BufWriter::new(File::create(cli.savedir.join($it)).unwrap())
+                File::create(cli.savedir.join($it)).unwrap()
             };
         }
 

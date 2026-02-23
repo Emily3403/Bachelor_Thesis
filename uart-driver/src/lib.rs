@@ -12,7 +12,7 @@ pub mod logger;
 pub mod uart;
 
 use crate::cli::Cli;
-use crate::logger::time::get_time;
+use crate::logger::get_time;
 use mutually_exclusive_features::exactly_one_of;
 
 exactly_one_of!("driver_irq", "driver_polling");
