@@ -1,9 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-cargo build --release --target=aarch64-unknown-linux-gnu \
-    --features "$FEATURES" \
-    --bin "$BINARY_NAME"
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+"$SCRIPT_DIR"/compile.sh "$@"
+
+if [ "$ONLY_COMPILE" == "True" ];
+then
+  exit 0
+fi
 
 rsync -a --mkpath target/aarch64-unknown-linux-gnu/release/"$BINARY_NAME" "$RASPI_CUSTOM_KERNEL_HOST":driver-binaries/"$BINARY_NAME"
 

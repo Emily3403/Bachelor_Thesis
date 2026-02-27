@@ -19,10 +19,10 @@ impl MiniUART {
     }
 
     #[cfg(feature = "driver_polling")]
-    fn wait_for_byte(&mut self) -> TimeStamp {
+    fn wait_for_byte(&mut self) -> (InterruptCount, TimeStamp) {
         loop {
             if self.regs.rx_byte_ready() {
-                break;
+                break (0, get_time());
             }
         }
     }

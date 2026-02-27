@@ -1,3 +1,6 @@
 dotenv
 fast_diff_match_patch
 more-itertools
+
+mypy
+flake8
