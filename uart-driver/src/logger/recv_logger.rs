@@ -9,7 +9,7 @@ use std::sync::mpsc::channel;
 impl LoggerType {
     pub fn from_cli(cli: &Cli) -> Self {
         let mut it = LoggerType::empty();
-        if cli.loglevel == "info" {
+        if cli.loglevel == "info" {;;
             it.insert(LoggerType::PACKETS)
         }
 

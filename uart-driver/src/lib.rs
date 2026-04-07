@@ -19,7 +19,7 @@ exactly_one_of!("driver_irq", "driver_polling");
 exactly_one_of!("io_data", "io_scratch");
 
 #[cfg(all(feature = "driver_polling", feature = "io_scratch"))]
-compile_error!("With polling enabled, the io_scratch feature isn't usable");
+compile_error!("With polling enable d, the io_scratch feature isn't usable");
 
 pub fn init_logging() {
     pretty_env_logger::init();
