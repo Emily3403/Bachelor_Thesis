@@ -1,0 +1,167 @@
+%&template
+\documentclass{article}
+\usepackage{src/template}
+
+\endofdump
+\usepackage{minted}
+
+\date{2025 -- 11 -- 16}
+\useTemplate[NPA, Exercise=4]
+\title{NPA -- Exercise 4}
+
+
+\begin{document}
+\maketitle
+
+    \section{}
+    \setcounter{subsection}{4}
+    \subsection{}
+
+    \begin{tikzpicture}
+        \begin{axis}[
+            % ymax=100000,
+            xmax=20,
+            axis y line*=left,
+            yticklabel style={
+                /pgf/number format/fixed,
+                /pgf/number format/precision=0
+            },
+            scaled y ticks=false,
+            ylabel style={blue},
+            x=0.6cm,
+        %
+            grid,
+        %
+            ylabel=Queue Occupancy (bytes),
+            xlabel=Time (s),
+            title=FifoQueueDisc,
+        ]
+            \addplot[blue] table {4-measurements/FifoQueueDisc-QueueSize.dat};
+        \end{axis}
+        \begin{axis}[
+            ymax=9,
+            xmax=20,
+            axis y line*=right,
+            axis x line=none,
+            ylabel style={red},
+            ylabel=RTT (s),
+            y filter/.code={\pgfmathdivide{y}{1000}},
+            x=0.6cm,
+        ]
+            \addplot[red, mark=*] table {4-measurements/FifoQueueDisc-RTT.dat};
+        \end{axis}
+    \end{tikzpicture}
+    %
+    
+    \texttt{FifoQueue} works like the basic example queuing system explained in the bachelor's degree Informatik at TU Berlin. 
+    In the graph of the FifoQueue we can observe the congestion starting on second 5. 
+    The Queue gets filled; as a result, the RTT of each ping increases linearly in our interval from second 5 to second 20. 
+    After the second 15, we would have expected some impact of the reduction of the queue occupancy because the \texttt{OnOffApplication} stops filling up the queue. The FiFoQueue cannot recover from the congestion in our timeframe.
+      Overall, The FifoQueue performs the worst because we only receive 13 out of 20 ping packets.  
+    
+    \begin{tikzpicture}
+        \begin{axis}[
+            % ymax=100000,
+            xmax=20,
+            axis y line*=left,
+            yticklabel style={
+                /pgf/number format/fixed,
+                /pgf/number format/precision=0
+            },
+            scaled y ticks=false,
+            ylabel style={blue},
+            x=0.6cm,
+        %
+            grid,
+        %
+            ylabel=Queue Occupancy (bytes),
+            xlabel=Time (s),
+            title=CoDelQueueDisc,
+        ]
+            \addplot[blue] table {4-measurements/CoDelQueueDisc-QueueSize.dat};
+        \end{axis}
+        \begin{axis}[
+            ymax=1.6,
+            xmax=20,
+            axis y line*=right,
+            axis x line=none,
+            ylabel style={red},
+            ylabel=RTT (s),
+            y filter/.code={\pgfmathdivide{y}{1000}},
+            x=0.6cm,
+        ]
+            \addplot[red, mark=*] table {4-measurements/CoDelQueueDisc-RTT.dat};
+        \end{axis}
+    \end{tikzpicture}
+    %
+    
+    CoDel is a queue management system in which packets are discarded as soon as the delay time in the queue becomes too long. It is not based on the queue length but on the actual waiting time of the packets.
+    \texttt{CoDelQueuDisc} achieves the most arrived ping packets (16 out of 20) in our timeframe, from second 0 to second 20.
+    In the congested state of the queue, \texttt{CoDelQueuDisc} can provide the most ping packets. 
+    After the second 15, it can reduce the queue occupancy. This causes the next ping packet to arrive similar to packets that have had no congestion. \texttt{RedQueueDisc} recovers a bit slower and with a marginally bigger RTT time in second 16. Compared to \texttt{RedQueueDisc} the RTT is a bit greater and more scattered in a congested state, but it can push more ping packets through and recovers faster.  
+    
+    
+    %- Codel https://datatracker.ietf.org/doc/html/rfc8289 - smaller traffic goes first??? fair 
+    %- most ping responses in Congested state
+    %unstable RTT in conguested state
+    %still packet loss? 
+    %ends congestion
+    %16/20
+
+    \begin{tikzpicture}
+        \begin{axis}[
+            % ymax=100000,
+            xmax=20,
+            axis y line*=left,
+            yticklabel style={
+                /pgf/number format/fixed,
+                /pgf/number format/precision=0
+            },
+            scaled y ticks=false,
+            ylabel style={blue},
+            x=0.6cm,
+        %
+            grid,
+        %
+            ylabel=Queue Occupancy (bytes),
+            xlabel=Time (s),
+            title=RedQueueDisc,
+        ]
+            \addplot[blue] table {4-measurements/RedQueueDisc-QueueSize.dat};
+        \end{axis}
+        \begin{axis}[
+            ymax=1.6,
+            xmax=20,
+            axis y line*=right,
+            axis x line=none,
+            ylabel style={red},
+            ylabel=RTT (s),
+            y filter/.code={\pgfmathdivide{y}{1000}},
+            x=0.6cm,
+        ]
+            \addplot[red, mark=*] table {4-measurements/RedQueueDisc-RTT.dat};
+        \end{axis}
+    \end{tikzpicture}
+
+    \texttt{RedQueueDisc} is based on active queue management, which detects congestion early by discarding packets with a certain probability \underline{before} the queue is full. In our experiment, we observed that during the period when the connection between the two routers was heavily loaded, only 4 ping messages were received back from the original sender, as opposed to 6 possible RTT measurements with \texttt{CoDelQueueDisc}. Through active management of the buffer, the RTT time could be kept constant at 1 second in comparison. It is little bit lower, but constant and therefore predictable. In summary, 14 out of 20 packages were returned in this case.
+
+    %Notes: RED 
+    %What is it? drops packets when queue is almost full 
+    %less RTT in seconds but only 4 Responses than Codel 
+    %Performs slightly better than fifo, based on RTT arrival
+    %less RTT time of packets 
+    %stable rtt 
+    %ends congestion
+    %??? MAybe ping got deleted in first slot between 5 and 8 ? 
+    %14/20
+    
+
+    \newpage
+        
+    \subsection{}
+    The returned disc type for a standard Ethernet interface on Linux is fq\_codel (Fair Queuing with Controlled Delay). FQ devides the incoming packets into multiple flows, depending on source IP, destination IP, source port, destination port and protocol. For each of the flows, a queue is created and scheduled using Deficit Round Robin. In each of the queues, CoDel is applied, analyzing time spent in the queue to evaluate, if drops are necessary. \cite{ns3-fqcodel} \cite{tc-fq_codel-manpage}
+
+    
+    \bibliographystyle{ieeetr}
+    \bibliography{src/references.bib}
+\end{document}

@@ -1,0 +1,102 @@
+\begin{MintedVerbatim}[commandchars=\\\{\},codes={\catcode`\$=3\catcode`\^=7\catcode`\_=8\relax}]
+    \PYG{n}{mininet}\PYG{o}{\PYGZgt{}} \PYG{n}{h1} \PYG{n}{ifconfig}
+\PYG{n}{h1}\PYG{o}{\PYGZhy{}}\PYG{n}{eth0}\PYG{p}{:} \PYG{n}{flags}\PYG{o}{=}\PYG{l+m+mi}{4163}\PYG{o}{\PYGZlt{}}\PYG{n}{UP}\PYG{p}{,}\PYG{n}{BROADCAST}\PYG{p}{,}\PYG{n}{RUNNING}\PYG{p}{,}\PYG{n}{MULTICAST}\PYG{o}{\PYGZgt{}}  \PYG{n}{mtu} \PYG{l+m+mi}{1500}
+        \PYG{n}{inet} \PYG{l+m+mf}{10.0}\PYG{l+m+mf}{.0}\PYG{l+m+mf}{.1}  \PYG{n}{netmask} \PYG{l+m+mf}{255.0}\PYG{l+m+mf}{.0}\PYG{l+m+mf}{.0}  \PYG{n}{broadcast} \PYG{l+m+mf}{10.255}\PYG{l+m+mf}{.255}\PYG{l+m+mf}{.255}
+        \PYG{n}{inet6} \PYG{n}{fe80}\PYG{p}{:}\PYG{p}{:}\PYG{n}{d88f}\PYG{p}{:}\PYG{l+m+mi}{53}\PYG{n}{ff}\PYG{p}{:}\PYG{n}{fe5a}\PYG{p}{:}\PYG{l+m+mi}{6653}  \PYG{n}{prefixlen} \PYG{l+m+mi}{64}  \PYG{n}{scopeid} \PYG{l+m+mh}{0x20}\PYG{o}{\PYGZlt{}}\PYG{n}{link}\PYG{o}{\PYGZgt{}}
+        \PYG{n}{ether} \PYG{esc}{\colorbox{yellow}{da:8f:53:5a:66:53}}  \PYG{n}{txqueuelen} \PYG{l+m+mi}{1000}  \PYG{p}{(}\PYG{n}{Ethernet}\PYG{p}{)}
+        \PYG{n}{RX} \PYG{n}{packets} \PYG{l+m+mi}{23}  \PYG{n+nb}{bytes} \PYG{l+m+mi}{1858} \PYG{p}{(}\PYG{l+m+mf}{1.8} \PYG{n}{KB}\PYG{p}{)}
+        \PYG{n}{RX} \PYG{n}{errors} \PYG{l+m+mi}{0}  \PYG{n}{dropped} \PYG{l+m+mi}{0}  \PYG{n}{overruns} \PYG{l+m+mi}{0}  \PYG{n}{frame} \PYG{l+m+mi}{0}
+        \PYG{n}{TX} \PYG{n}{packets} \PYG{l+m+mi}{9}  \PYG{n+nb}{bytes} \PYG{l+m+mi}{726} \PYG{p}{(}\PYG{l+m+mf}{726.0} \PYG{n}{B}\PYG{p}{)}
+        \PYG{n}{TX} \PYG{n}{errors} \PYG{l+m+mi}{0}  \PYG{n}{dropped} \PYG{l+m+mi}{0} \PYG{n}{overruns} \PYG{l+m+mi}{0}  \PYG{n}{carrier} \PYG{l+m+mi}{0}  \PYG{n}{collisions} \PYG{l+m+mi}{0}
+
+\PYG{n}{lo}\PYG{p}{:} \PYG{n}{flags}\PYG{o}{=}\PYG{l+m+mi}{73}\PYG{o}{\PYGZlt{}}\PYG{n}{UP}\PYG{p}{,}\PYG{n}{LOOPBACK}\PYG{p}{,}\PYG{n}{RUNNING}\PYG{o}{\PYGZgt{}}  \PYG{n}{mtu} \PYG{l+m+mi}{65536}
+        \PYG{n}{inet} \PYG{l+m+mf}{127.0}\PYG{l+m+mf}{.0}\PYG{l+m+mf}{.1}  \PYG{n}{netmask} \PYG{l+m+mf}{255.0}\PYG{l+m+mf}{.0}\PYG{l+m+mf}{.0}
+        \PYG{n}{inet6} \PYG{p}{:}\PYG{p}{:}\PYG{l+m+mi}{1}  \PYG{n}{prefixlen} \PYG{l+m+mi}{128}  \PYG{n}{scopeid} \PYG{l+m+mh}{0x10}\PYG{o}{\PYGZlt{}}\PYG{n}{host}\PYG{o}{\PYGZgt{}}
+        \PYG{n}{loop}  \PYG{n}{txqueuelen} \PYG{l+m+mi}{1000}  \PYG{p}{(}\PYG{n}{Local} \PYG{n}{Loopback}\PYG{p}{)}
+        \PYG{n}{RX} \PYG{n}{packets} \PYG{l+m+mi}{0}  \PYG{n+nb}{bytes} \PYG{l+m+mi}{0} \PYG{p}{(}\PYG{l+m+mf}{0.0} \PYG{n}{B}\PYG{p}{)}
+        \PYG{n}{RX} \PYG{n}{errors} \PYG{l+m+mi}{0}  \PYG{n}{dropped} \PYG{l+m+mi}{0}  \PYG{n}{overruns} \PYG{l+m+mi}{0}  \PYG{n}{frame} \PYG{l+m+mi}{0}
+        \PYG{n}{TX} \PYG{n}{packets} \PYG{l+m+mi}{0}  \PYG{n+nb}{bytes} \PYG{l+m+mi}{0} \PYG{p}{(}\PYG{l+m+mf}{0.0} \PYG{n}{B}\PYG{p}{)}
+        \PYG{n}{TX} \PYG{n}{errors} \PYG{l+m+mi}{0}  \PYG{n}{dropped} \PYG{l+m+mi}{0} \PYG{n}{overruns} \PYG{l+m+mi}{0}  \PYG{n}{carrier} \PYG{l+m+mi}{0}  \PYG{n}{collisions} \PYG{l+m+mi}{0}
+
+\PYG{n}{mininet}\PYG{o}{\PYGZgt{}} \PYG{n}{h2} \PYG{n}{ifconfig}
+\PYG{n}{h2}\PYG{o}{\PYGZhy{}}\PYG{n}{eth0}\PYG{p}{:} \PYG{n}{flags}\PYG{o}{=}\PYG{l+m+mi}{4163}\PYG{o}{\PYGZlt{}}\PYG{n}{UP}\PYG{p}{,}\PYG{n}{BROADCAST}\PYG{p}{,}\PYG{n}{RUNNING}\PYG{p}{,}\PYG{n}{MULTICAST}\PYG{o}{\PYGZgt{}}  \PYG{n}{mtu} \PYG{l+m+mi}{1500}
+        \PYG{n}{inet} \PYG{l+m+mf}{10.0}\PYG{l+m+mf}{.0}\PYG{l+m+mf}{.2}  \PYG{n}{netmask} \PYG{l+m+mf}{255.0}\PYG{l+m+mf}{.0}\PYG{l+m+mf}{.0}  \PYG{n}{broadcast} \PYG{l+m+mf}{10.255}\PYG{l+m+mf}{.255}\PYG{l+m+mf}{.255}
+        \PYG{n}{inet6} \PYG{n}{fe80}\PYG{p}{:}\PYG{p}{:}\PYG{l+m+mi}{48}\PYG{n}{a6}\PYG{p}{:}\PYG{l+m+mi}{82}\PYG{n}{ff}\PYG{p}{:}\PYG{n}{fe75}\PYG{p}{:}\PYG{n}{bb0d}  \PYG{n}{prefixlen} \PYG{l+m+mi}{64}  \PYG{n}{scopeid} \PYG{l+m+mh}{0x20}\PYG{o}{\PYGZlt{}}\PYG{n}{link}\PYG{o}{\PYGZgt{}}
+        \PYG{n}{ether} \PYG{esc}{\colorbox{yellow}{4a:a6:82:75:bb:0d}}  \PYG{n}{txqueuelen} \PYG{l+m+mi}{1000}  \PYG{p}{(}\PYG{n}{Ethernet}\PYG{p}{)}
+        \PYG{n}{RX} \PYG{n}{packets} \PYG{l+m+mi}{25}  \PYG{n+nb}{bytes} \PYG{l+m+mi}{1998} \PYG{p}{(}\PYG{l+m+mf}{1.9} \PYG{n}{KB}\PYG{p}{)}
+        \PYG{n}{RX} \PYG{n}{errors} \PYG{l+m+mi}{0}  \PYG{n}{dropped} \PYG{l+m+mi}{0}  \PYG{n}{overruns} \PYG{l+m+mi}{0}  \PYG{n}{frame} \PYG{l+m+mi}{0}
+        \PYG{n}{TX} \PYG{n}{packets} \PYG{l+m+mi}{9}  \PYG{n+nb}{bytes} \PYG{l+m+mi}{726} \PYG{p}{(}\PYG{l+m+mf}{726.0} \PYG{n}{B}\PYG{p}{)}
+        \PYG{n}{TX} \PYG{n}{errors} \PYG{l+m+mi}{0}  \PYG{n}{dropped} \PYG{l+m+mi}{0} \PYG{n}{overruns} \PYG{l+m+mi}{0}  \PYG{n}{carrier} \PYG{l+m+mi}{0}  \PYG{n}{collisions} \PYG{l+m+mi}{0}
+
+\PYG{n}{lo}\PYG{p}{:} \PYG{n}{flags}\PYG{o}{=}\PYG{l+m+mi}{73}\PYG{o}{\PYGZlt{}}\PYG{n}{UP}\PYG{p}{,}\PYG{n}{LOOPBACK}\PYG{p}{,}\PYG{n}{RUNNING}\PYG{o}{\PYGZgt{}}  \PYG{n}{mtu} \PYG{l+m+mi}{65536}
+        \PYG{n}{inet} \PYG{l+m+mf}{127.0}\PYG{l+m+mf}{.0}\PYG{l+m+mf}{.1}  \PYG{n}{netmask} \PYG{l+m+mf}{255.0}\PYG{l+m+mf}{.0}\PYG{l+m+mf}{.0}
+        \PYG{n}{inet6} \PYG{p}{:}\PYG{p}{:}\PYG{l+m+mi}{1}  \PYG{n}{prefixlen} \PYG{l+m+mi}{128}  \PYG{n}{scopeid} \PYG{l+m+mh}{0x10}\PYG{o}{\PYGZlt{}}\PYG{n}{host}\PYG{o}{\PYGZgt{}}
+        \PYG{n}{loop}  \PYG{n}{txqueuelen} \PYG{l+m+mi}{1000}  \PYG{p}{(}\PYG{n}{Local} \PYG{n}{Loopback}\PYG{p}{)}
+        \PYG{n}{RX} \PYG{n}{packets} \PYG{l+m+mi}{0}  \PYG{n+nb}{bytes} \PYG{l+m+mi}{0} \PYG{p}{(}\PYG{l+m+mf}{0.0} \PYG{n}{B}\PYG{p}{)}
+        \PYG{n}{RX} \PYG{n}{errors} \PYG{l+m+mi}{0}  \PYG{n}{dropped} \PYG{l+m+mi}{0}  \PYG{n}{overruns} \PYG{l+m+mi}{0}  \PYG{n}{frame} \PYG{l+m+mi}{0}
+        \PYG{n}{TX} \PYG{n}{packets} \PYG{l+m+mi}{0}  \PYG{n+nb}{bytes} \PYG{l+m+mi}{0} \PYG{p}{(}\PYG{l+m+mf}{0.0} \PYG{n}{B}\PYG{p}{)}
+        \PYG{n}{TX} \PYG{n}{errors} \PYG{l+m+mi}{0}  \PYG{n}{dropped} \PYG{l+m+mi}{0} \PYG{n}{overruns} \PYG{l+m+mi}{0}  \PYG{n}{carrier} \PYG{l+m+mi}{0}  \PYG{n}{collisions} \PYG{l+m+mi}{0}
+
+\PYG{n}{mininet}\PYG{o}{\PYGZgt{}} \PYG{n}{h3} \PYG{n}{ifconfig}
+\PYG{n}{h3}\PYG{o}{\PYGZhy{}}\PYG{n}{eth0}\PYG{p}{:} \PYG{n}{flags}\PYG{o}{=}\PYG{l+m+mi}{4163}\PYG{o}{\PYGZlt{}}\PYG{n}{UP}\PYG{p}{,}\PYG{n}{BROADCAST}\PYG{p}{,}\PYG{n}{RUNNING}\PYG{p}{,}\PYG{n}{MULTICAST}\PYG{o}{\PYGZgt{}}  \PYG{n}{mtu} \PYG{l+m+mi}{1500}
+        \PYG{n}{inet} \PYG{l+m+mf}{10.0}\PYG{l+m+mf}{.0}\PYG{l+m+mf}{.3}  \PYG{n}{netmask} \PYG{l+m+mf}{255.0}\PYG{l+m+mf}{.0}\PYG{l+m+mf}{.0}  \PYG{n}{broadcast} \PYG{l+m+mf}{10.255}\PYG{l+m+mf}{.255}\PYG{l+m+mf}{.255}
+        \PYG{n}{inet6} \PYG{n}{fe80}\PYG{p}{:}\PYG{p}{:}\PYG{n}{b84e}\PYG{p}{:}\PYG{n}{b6ff}\PYG{p}{:}\PYG{n}{fe40}\PYG{p}{:}\PYG{l+m+mi}{6}\PYG{n}{f3d}  \PYG{n}{prefixlen} \PYG{l+m+mi}{64}  \PYG{n}{scopeid} \PYG{l+m+mh}{0x20}\PYG{o}{\PYGZlt{}}\PYG{n}{link}\PYG{o}{\PYGZgt{}}
+        \PYG{n}{ether} \PYG{esc}{\colorbox{yellow}{ba:4e:b6:40:6f:3d}}  \PYG{n}{txqueuelen} \PYG{l+m+mi}{1000}  \PYG{p}{(}\PYG{n}{Ethernet}\PYG{p}{)}
+        \PYG{n}{RX} \PYG{n}{packets} \PYG{l+m+mi}{25}  \PYG{n+nb}{bytes} \PYG{l+m+mi}{1998} \PYG{p}{(}\PYG{l+m+mf}{1.9} \PYG{n}{KB}\PYG{p}{)}
+        \PYG{n}{RX} \PYG{n}{errors} \PYG{l+m+mi}{0}  \PYG{n}{dropped} \PYG{l+m+mi}{0}  \PYG{n}{overruns} \PYG{l+m+mi}{0}  \PYG{n}{frame} \PYG{l+m+mi}{0}
+        \PYG{n}{TX} \PYG{n}{packets} \PYG{l+m+mi}{9}  \PYG{n+nb}{bytes} \PYG{l+m+mi}{726} \PYG{p}{(}\PYG{l+m+mf}{726.0} \PYG{n}{B}\PYG{p}{)}
+        \PYG{n}{TX} \PYG{n}{errors} \PYG{l+m+mi}{0}  \PYG{n}{dropped} \PYG{l+m+mi}{0} \PYG{n}{overruns} \PYG{l+m+mi}{0}  \PYG{n}{carrier} \PYG{l+m+mi}{0}  \PYG{n}{collisions} \PYG{l+m+mi}{0}
+
+\PYG{n}{lo}\PYG{p}{:} \PYG{n}{flags}\PYG{o}{=}\PYG{l+m+mi}{73}\PYG{o}{\PYGZlt{}}\PYG{n}{UP}\PYG{p}{,}\PYG{n}{LOOPBACK}\PYG{p}{,}\PYG{n}{RUNNING}\PYG{o}{\PYGZgt{}}  \PYG{n}{mtu} \PYG{l+m+mi}{65536}
+        \PYG{n}{inet} \PYG{l+m+mf}{127.0}\PYG{l+m+mf}{.0}\PYG{l+m+mf}{.1}  \PYG{n}{netmask} \PYG{l+m+mf}{255.0}\PYG{l+m+mf}{.0}\PYG{l+m+mf}{.0}
+        \PYG{n}{inet6} \PYG{p}{:}\PYG{p}{:}\PYG{l+m+mi}{1}  \PYG{n}{prefixlen} \PYG{l+m+mi}{128}  \PYG{n}{scopeid} \PYG{l+m+mh}{0x10}\PYG{o}{\PYGZlt{}}\PYG{n}{host}\PYG{o}{\PYGZgt{}}
+        \PYG{n}{loop}  \PYG{n}{txqueuelen} \PYG{l+m+mi}{1000}  \PYG{p}{(}\PYG{n}{Local} \PYG{n}{Loopback}\PYG{p}{)}
+        \PYG{n}{RX} \PYG{n}{packets} \PYG{l+m+mi}{0}  \PYG{n+nb}{bytes} \PYG{l+m+mi}{0} \PYG{p}{(}\PYG{l+m+mf}{0.0} \PYG{n}{B}\PYG{p}{)}
+        \PYG{n}{RX} \PYG{n}{errors} \PYG{l+m+mi}{0}  \PYG{n}{dropped} \PYG{l+m+mi}{0}  \PYG{n}{overruns} \PYG{l+m+mi}{0}  \PYG{n}{frame} \PYG{l+m+mi}{0}
+        \PYG{n}{TX} \PYG{n}{packets} \PYG{l+m+mi}{0}  \PYG{n+nb}{bytes} \PYG{l+m+mi}{0} \PYG{p}{(}\PYG{l+m+mf}{0.0} \PYG{n}{B}\PYG{p}{)}
+        \PYG{n}{TX} \PYG{n}{errors} \PYG{l+m+mi}{0}  \PYG{n}{dropped} \PYG{l+m+mi}{0} \PYG{n}{overruns} \PYG{l+m+mi}{0}  \PYG{n}{carrier} \PYG{l+m+mi}{0}  \PYG{n}{collisions} \PYG{l+m+mi}{0}
+
+\PYG{n}{mininet}\PYG{o}{\PYGZgt{}} \PYG{n}{s1} \PYG{n}{ifconfig}
+\PYG{n}{enp0s3}\PYG{p}{:} \PYG{n}{flags}\PYG{o}{=}\PYG{l+m+mi}{4163}\PYG{o}{\PYGZlt{}}\PYG{n}{UP}\PYG{p}{,}\PYG{n}{BROADCAST}\PYG{p}{,}\PYG{n}{RUNNING}\PYG{p}{,}\PYG{n}{MULTICAST}\PYG{o}{\PYGZgt{}}  \PYG{n}{mtu} \PYG{l+m+mi}{1500}
+        \PYG{n}{inet} \PYG{l+m+mf}{10.0}\PYG{l+m+mf}{.2}\PYG{l+m+mf}{.15}  \PYG{n}{netmask} \PYG{l+m+mf}{255.255}\PYG{l+m+mf}{.255}\PYG{l+m+mf}{.0}  \PYG{n}{broadcast} \PYG{l+m+mf}{10.0}\PYG{l+m+mf}{.2}\PYG{l+m+mf}{.255}
+        \PYG{n}{inet6} \PYG{n}{fd17}\PYG{p}{:}\PYG{l+m+mi}{625}\PYG{n}{c}\PYG{p}{:}\PYG{n}{f037}\PYG{p}{:}\PYG{l+m+mi}{2}\PYG{p}{:}\PYG{l+m+mi}{4}\PYG{n}{d}\PYG{p}{:}\PYG{l+m+mi}{39}\PYG{n}{ff}\PYG{p}{:}\PYG{n}{fe94}\PYG{p}{:}\PYG{l+m+mi}{1}\PYG{n}{dac}  \PYG{n}{prefixlen} \PYG{l+m+mi}{64}  \PYG{n}{scopeid} \PYG{l+m+mh}{0x0}\PYG{o}{\PYGZlt{}}\PYG{k}{global}\PYG{o}{\PYGZgt{}}
+        \PYG{n}{inet6} \PYG{n}{fe80}\PYG{p}{:}\PYG{p}{:}\PYG{l+m+mi}{4}\PYG{n}{d}\PYG{p}{:}\PYG{l+m+mi}{39}\PYG{n}{ff}\PYG{p}{:}\PYG{n}{fe94}\PYG{p}{:}\PYG{l+m+mi}{1}\PYG{n}{dac}  \PYG{n}{prefixlen} \PYG{l+m+mi}{64}  \PYG{n}{scopeid} \PYG{l+m+mh}{0x20}\PYG{o}{\PYGZlt{}}\PYG{n}{link}\PYG{o}{\PYGZgt{}}
+        \PYG{n}{ether} \PYG{esc}{\colorbox{yellow}{02:4d:39:94:1d:ac}}  \PYG{n}{txqueuelen} \PYG{l+m+mi}{1000}  \PYG{p}{(}\PYG{n}{Ethernet}\PYG{p}{)}
+        \PYG{n}{RX} \PYG{n}{packets} \PYG{l+m+mi}{149947}  \PYG{n+nb}{bytes} \PYG{l+m+mi}{210647871} \PYG{p}{(}\PYG{l+m+mf}{210.6} \PYG{n}{MB}\PYG{p}{)}
+        \PYG{n}{RX} \PYG{n}{errors} \PYG{l+m+mi}{0}  \PYG{n}{dropped} \PYG{l+m+mi}{0}  \PYG{n}{overruns} \PYG{l+m+mi}{0}  \PYG{n}{frame} \PYG{l+m+mi}{0}
+        \PYG{n}{TX} \PYG{n}{packets} \PYG{l+m+mi}{30857}  \PYG{n+nb}{bytes} \PYG{l+m+mi}{2367886} \PYG{p}{(}\PYG{l+m+mf}{2.3} \PYG{n}{MB}\PYG{p}{)}
+        \PYG{n}{TX} \PYG{n}{errors} \PYG{l+m+mi}{0}  \PYG{n}{dropped} \PYG{l+m+mi}{0} \PYG{n}{overruns} \PYG{l+m+mi}{0}  \PYG{n}{carrier} \PYG{l+m+mi}{0}  \PYG{n}{collisions} \PYG{l+m+mi}{0}
+
+\PYG{n}{lo}\PYG{p}{:} \PYG{n}{flags}\PYG{o}{=}\PYG{l+m+mi}{73}\PYG{o}{\PYGZlt{}}\PYG{n}{UP}\PYG{p}{,}\PYG{n}{LOOPBACK}\PYG{p}{,}\PYG{n}{RUNNING}\PYG{o}{\PYGZgt{}}  \PYG{n}{mtu} \PYG{l+m+mi}{65536}
+        \PYG{n}{inet} \PYG{l+m+mf}{127.0}\PYG{l+m+mf}{.0}\PYG{l+m+mf}{.1}  \PYG{n}{netmask} \PYG{l+m+mf}{255.0}\PYG{l+m+mf}{.0}\PYG{l+m+mf}{.0}
+        \PYG{n}{inet6} \PYG{p}{:}\PYG{p}{:}\PYG{l+m+mi}{1}  \PYG{n}{prefixlen} \PYG{l+m+mi}{128}  \PYG{n}{scopeid} \PYG{l+m+mh}{0x10}\PYG{o}{\PYGZlt{}}\PYG{n}{host}\PYG{o}{\PYGZgt{}}
+        \PYG{n}{loop}  \PYG{n}{txqueuelen} \PYG{l+m+mi}{1000}  \PYG{p}{(}\PYG{n}{Local} \PYG{n}{Loopback}\PYG{p}{)}
+        \PYG{n}{RX} \PYG{n}{packets} \PYG{l+m+mi}{28291411}  \PYG{n+nb}{bytes} \PYG{l+m+mi}{5700610833} \PYG{p}{(}\PYG{l+m+mf}{5.7} \PYG{n}{GB}\PYG{p}{)}
+        \PYG{n}{RX} \PYG{n}{errors} \PYG{l+m+mi}{0}  \PYG{n}{dropped} \PYG{l+m+mi}{0}  \PYG{n}{overruns} \PYG{l+m+mi}{0}  \PYG{n}{frame} \PYG{l+m+mi}{0}
+        \PYG{n}{TX} \PYG{n}{packets} \PYG{l+m+mi}{28291411}  \PYG{n+nb}{bytes} \PYG{l+m+mi}{5700610833} \PYG{p}{(}\PYG{l+m+mf}{5.7} \PYG{n}{GB}\PYG{p}{)}
+        \PYG{n}{TX} \PYG{n}{errors} \PYG{l+m+mi}{0}  \PYG{n}{dropped} \PYG{l+m+mi}{0} \PYG{n}{overruns} \PYG{l+m+mi}{0}  \PYG{n}{carrier} \PYG{l+m+mi}{0}  \PYG{n}{collisions} \PYG{l+m+mi}{0}
+
+\PYG{n}{s1}\PYG{o}{\PYGZhy{}}\PYG{n}{eth1}\PYG{p}{:} \PYG{n}{flags}\PYG{o}{=}\PYG{l+m+mi}{4163}\PYG{o}{\PYGZlt{}}\PYG{n}{UP}\PYG{p}{,}\PYG{n}{BROADCAST}\PYG{p}{,}\PYG{n}{RUNNING}\PYG{p}{,}\PYG{n}{MULTICAST}\PYG{o}{\PYGZgt{}}  \PYG{n}{mtu} \PYG{l+m+mi}{1500}
+        \PYG{n}{inet6} \PYG{n}{fe80}\PYG{p}{:}\PYG{p}{:}\PYG{n}{e}\PYG{p}{:}\PYG{n}{e2ff}\PYG{p}{:}\PYG{n}{fe89}\PYG{p}{:}\PYG{l+m+mf}{2e61}  \PYG{n}{prefixlen} \PYG{l+m+mi}{64}  \PYG{n}{scopeid} \PYG{l+m+mh}{0x20}\PYG{o}{\PYGZlt{}}\PYG{n}{link}\PYG{o}{\PYGZgt{}}
+        \PYG{n}{ether} \PYG{esc}{\colorbox{yellow}{02:0e:e2:89:2e:61}}  \PYG{n}{txqueuelen} \PYG{l+m+mi}{1000}  \PYG{p}{(}\PYG{n}{Ethernet}\PYG{p}{)}
+        \PYG{n}{RX} \PYG{n}{packets} \PYG{l+m+mi}{10}  \PYG{n+nb}{bytes} \PYG{l+m+mi}{796} \PYG{p}{(}\PYG{l+m+mf}{796.0} \PYG{n}{B}\PYG{p}{)}
+        \PYG{n}{RX} \PYG{n}{errors} \PYG{l+m+mi}{0}  \PYG{n}{dropped} \PYG{l+m+mi}{0}  \PYG{n}{overruns} \PYG{l+m+mi}{0}  \PYG{n}{frame} \PYG{l+m+mi}{0}
+        \PYG{n}{TX} \PYG{n}{packets} \PYG{l+m+mi}{27}  \PYG{n+nb}{bytes} \PYG{l+m+mi}{2138} \PYG{p}{(}\PYG{l+m+mf}{2.1} \PYG{n}{KB}\PYG{p}{)}
+        \PYG{n}{TX} \PYG{n}{errors} \PYG{l+m+mi}{0}  \PYG{n}{dropped} \PYG{l+m+mi}{0} \PYG{n}{overruns} \PYG{l+m+mi}{0}  \PYG{n}{carrier} \PYG{l+m+mi}{0}  \PYG{n}{collisions} \PYG{l+m+mi}{0}
+
+\PYG{n}{s1}\PYG{o}{\PYGZhy{}}\PYG{n}{eth2}\PYG{p}{:} \PYG{n}{flags}\PYG{o}{=}\PYG{l+m+mi}{4163}\PYG{o}{\PYGZlt{}}\PYG{n}{UP}\PYG{p}{,}\PYG{n}{BROADCAST}\PYG{p}{,}\PYG{n}{RUNNING}\PYG{p}{,}\PYG{n}{MULTICAST}\PYG{o}{\PYGZgt{}}  \PYG{n}{mtu} \PYG{l+m+mi}{1500}
+        \PYG{n}{inet6} \PYG{n}{fe80}\PYG{p}{:}\PYG{p}{:}\PYG{l+m+mi}{204}\PYG{n}{d}\PYG{p}{:}\PYG{l+m+mi}{70}\PYG{n}{ff}\PYG{p}{:}\PYG{n}{feaa}\PYG{p}{:}\PYG{n}{c5c6}  \PYG{n}{prefixlen} \PYG{l+m+mi}{64}  \PYG{n}{scopeid} \PYG{l+m+mh}{0x20}\PYG{o}{\PYGZlt{}}\PYG{n}{link}\PYG{o}{\PYGZgt{}}
+        \PYG{n}{ether} \PYG{esc}{\colorbox{yellow}{22:4d:70:aa:c5:c6}}  \PYG{n}{txqueuelen} \PYG{l+m+mi}{1000}  \PYG{p}{(}\PYG{n}{Ethernet}\PYG{p}{)}
+        \PYG{n}{RX} \PYG{n}{packets} \PYG{l+m+mi}{10}  \PYG{n+nb}{bytes} \PYG{l+m+mi}{796} \PYG{p}{(}\PYG{l+m+mf}{796.0} \PYG{n}{B}\PYG{p}{)}
+        \PYG{n}{RX} \PYG{n}{errors} \PYG{l+m+mi}{0}  \PYG{n}{dropped} \PYG{l+m+mi}{0}  \PYG{n}{overruns} \PYG{l+m+mi}{0}  \PYG{n}{frame} \PYG{l+m+mi}{0}
+        \PYG{n}{TX} \PYG{n}{packets} \PYG{l+m+mi}{28}  \PYG{n+nb}{bytes} \PYG{l+m+mi}{2208} \PYG{p}{(}\PYG{l+m+mf}{2.2} \PYG{n}{KB}\PYG{p}{)}
+        \PYG{n}{TX} \PYG{n}{errors} \PYG{l+m+mi}{0}  \PYG{n}{dropped} \PYG{l+m+mi}{0} \PYG{n}{overruns} \PYG{l+m+mi}{0}  \PYG{n}{carrier} \PYG{l+m+mi}{0}  \PYG{n}{collisions} \PYG{l+m+mi}{0}
+
+\PYG{n}{s1}\PYG{o}{\PYGZhy{}}\PYG{n}{eth3}\PYG{p}{:} \PYG{n}{flags}\PYG{o}{=}\PYG{l+m+mi}{4163}\PYG{o}{\PYGZlt{}}\PYG{n}{UP}\PYG{p}{,}\PYG{n}{BROADCAST}\PYG{p}{,}\PYG{n}{RUNNING}\PYG{p}{,}\PYG{n}{MULTICAST}\PYG{o}{\PYGZgt{}}  \PYG{n}{mtu} \PYG{l+m+mi}{1500}
+        \PYG{n}{inet6} \PYG{n}{fe80}\PYG{p}{:}\PYG{p}{:}\PYG{l+m+mi}{9}\PYG{n}{ccb}\PYG{p}{:}\PYG{n}{edff}\PYG{p}{:}\PYG{n}{fec5}\PYG{p}{:}\PYG{l+m+mi}{4114}  \PYG{n}{prefixlen} \PYG{l+m+mi}{64}  \PYG{n}{scopeid} \PYG{l+m+mh}{0x20}\PYG{o}{\PYGZlt{}}\PYG{n}{link}\PYG{o}{\PYGZgt{}}
+        \PYG{n}{ether} \PYG{esc}{\colorbox{yellow}{9e:cb:ed:c5:41:14}}  \PYG{n}{txqueuelen} \PYG{l+m+mi}{1000}  \PYG{p}{(}\PYG{n}{Ethernet}\PYG{p}{)}
+        \PYG{n}{RX} \PYG{n}{packets} \PYG{l+m+mi}{10}  \PYG{n+nb}{bytes} \PYG{l+m+mi}{796} \PYG{p}{(}\PYG{l+m+mf}{796.0} \PYG{n}{B}\PYG{p}{)}
+        \PYG{n}{RX} \PYG{n}{errors} \PYG{l+m+mi}{0}  \PYG{n}{dropped} \PYG{l+m+mi}{0}  \PYG{n}{overruns} \PYG{l+m+mi}{0}  \PYG{n}{frame} \PYG{l+m+mi}{0}
+        \PYG{n}{TX} \PYG{n}{packets} \PYG{l+m+mi}{28}  \PYG{n+nb}{bytes} \PYG{l+m+mi}{2208} \PYG{p}{(}\PYG{l+m+mf}{2.2} \PYG{n}{KB}\PYG{p}{)}
+        \PYG{n}{TX} \PYG{n}{errors} \PYG{l+m+mi}{0}  \PYG{n}{dropped} \PYG{l+m+mi}{0} \PYG{n}{overruns} \PYG{l+m+mi}{0}  \PYG{n}{carrier} \PYG{l+m+mi}{0}  \PYG{n}{collisions} \PYG{l+m+mi}{0}
+\end{MintedVerbatim}

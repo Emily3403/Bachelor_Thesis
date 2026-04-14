@@ -1,0 +1,36 @@
+\begin{MintedVerbatim}[commandchars=\\\{\},codes={\catcode`\$=3\catcode`\^=7\catcode`\_=8\relax}]
+    \PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{\PYGZus{}packet\PYGZus{}in\PYGZus{}handler}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{ev}\PYG{p}{)}\PYG{p}{:}
+        \PYG{n}{msg} \PYG{o}{=} \PYG{n}{ev}\PYG{o}{.}\PYG{n}{msg}
+        \PYG{n}{datapath} \PYG{o}{=} \PYG{n}{msg}\PYG{o}{.}\PYG{n}{datapath}
+        \PYG{n}{switch\PYGZus{}id} \PYG{o}{=} \PYG{n}{datapath}\PYG{o}{.}\PYG{n}{id}
+        \PYG{n}{ofproto} \PYG{o}{=} \PYG{n}{datapath}\PYG{o}{.}\PYG{n}{ofproto}
+        \PYG{n}{parser} \PYG{o}{=} \PYG{n}{datapath}\PYG{o}{.}\PYG{n}{ofproto\PYGZus{}parser}
+
+        \PYG{n}{in\PYGZus{}port} \PYG{o}{=} \PYG{n}{msg}\PYG{o}{.}\PYG{n}{match}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{in\PYGZus{}port}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}
+
+        \PYG{n}{pkt} \PYG{o}{=} \PYG{n}{packet}\PYG{o}{.}\PYG{n}{Packet}\PYG{p}{(}\PYG{n}{msg}\PYG{o}{.}\PYG{n}{data}\PYG{p}{)}
+        \PYG{n}{ether\PYGZus{}info} \PYG{o}{=} \PYG{n}{pkt}\PYG{o}{.}\PYG{n}{get\PYGZus{}protocol}\PYG{p}{(}\PYG{n}{ethernet}\PYG{o}{.}\PYG{n}{ethernet}\PYG{p}{)}
+
+        \PYG{c+c1}{\PYGZsh{} debug output}
+        \PYG{c+c1}{\PYGZsh{} print(f\PYGZdq{}Switch \PYGZob{}switch\PYGZus{}id\PYGZcb{} received a packet on port \PYGZob{}in\PYGZus{}port\PYGZcb{} with src MAC \PYGZob{}ether\PYGZus{}info.src\PYGZcb{} and dst MAC \PYGZob{}ether\PYGZus{}info.dst\PYGZcb{}\PYGZdq{})}
+
+        \PYG{c+c1}{\PYGZsh{} flood}
+        \PYG{n}{actions\PYGZus{}flood} \PYG{o}{=} \PYG{p}{[}\PYG{n}{parser}\PYG{o}{.}\PYG{n}{OFPActionOutput}\PYG{p}{(}\PYG{n}{ofproto}\PYG{o}{.}\PYG{n}{OFPP\PYGZus{}FLOOD}\PYG{p}{)}\PYG{p}{]}
+        \PYG{n}{match\PYGZus{}flood} \PYG{o}{=} \PYG{n}{parser}\PYG{o}{.}\PYG{n}{OFPMatch}\PYG{p}{(}\PYG{n}{in\PYGZus{}port}\PYG{o}{=}\PYG{n}{in\PYGZus{}port}\PYG{p}{)}
+
+        \PYG{n}{out} \PYG{o}{=} \PYG{n}{parser}\PYG{o}{.}\PYG{n}{OFPPacketOut}\PYG{p}{(}
+            \PYG{n}{datapath}\PYG{o}{=}\PYG{n}{datapath}\PYG{p}{,}
+            \PYG{n}{buffer\PYGZus{}id}\PYG{o}{=}\PYG{n}{ofproto}\PYG{o}{.}\PYG{n}{OFP\PYGZus{}NO\PYGZus{}BUFFER}\PYG{p}{,}
+            \PYG{n}{match}\PYG{o}{=}\PYG{n}{match\PYGZus{}flood}\PYG{p}{,}
+            \PYG{n}{actions}\PYG{o}{=}\PYG{n}{actions\PYGZus{}flood}\PYG{p}{,}
+            \PYG{n}{data}\PYG{o}{=}\PYG{n}{msg}\PYG{o}{.}\PYG{n}{data}
+        \PYG{p}{)}
+        \PYG{n}{datapath}\PYG{o}{.}\PYG{n}{send\PYGZus{}msg}\PYG{p}{(}\PYG{n}{out}\PYG{p}{)}
+
+        \PYG{c+c1}{\PYGZsh{} learn MAC adress to avoid flooding next time}
+        \PYG{n}{match\PYGZus{}learn} \PYG{o}{=} \PYG{n}{parser}\PYG{o}{.}\PYG{n}{OFPMatch}\PYG{p}{(}\PYG{n}{eth\PYGZus{}dst}\PYG{o}{=}\PYG{n}{ether\PYGZus{}info}\PYG{o}{.}\PYG{n}{src}\PYG{p}{)}
+        \PYG{n}{actions\PYGZus{}learn} \PYG{o}{=} \PYG{p}{[}\PYG{n}{parser}\PYG{o}{.}\PYG{n}{OFPActionOutput}\PYG{p}{(}\PYG{n}{in\PYGZus{}port}\PYG{p}{)}\PYG{p}{]}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{add\PYGZus{}flow}\PYG{p}{(}\PYG{n}{datapath}\PYG{p}{,} \PYG{n}{actions}\PYG{o}{=}\PYG{n}{actions\PYGZus{}learn}\PYG{p}{,} \PYG{n}{priority}\PYG{o}{=}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{n}{match}\PYG{o}{=}\PYG{n}{match\PYGZus{}learn}\PYG{p}{,} \PYG{n}{timeout}\PYG{o}{=}\PYG{l+m+mi}{20}\PYG{p}{)}
+        \PYG{c+c1}{\PYGZsh{} We choose idle\PYGZus{}timeout and not hard\PYGZus{}timeout, because it seems to be more what the exercise wants.}
+        \PYG{c+c1}{\PYGZsh{} Adding a hard timeout would remove the entry after a fixed time, regardless of activity.}
+\end{MintedVerbatim}

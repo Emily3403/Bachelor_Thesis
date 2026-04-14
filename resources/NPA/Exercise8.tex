@@ -1,0 +1,303 @@
+%&template
+\documentclass{article}
+\usepackage{src/template}
+
+\endofdump
+\usepackage{minted}
+\usepackage{amsmath}
+
+\date{2025 -- 12 -- 14}
+\useTemplate[NPA, Exercise=8]
+\title{NPA -- Exercise 8}
+
+
+\begin{document}
+\maketitle
+    
+    \section{}
+    \subsection{}
+
+        \begin{center}
+            Routing Table:
+            \begin{align*}
+            \text{R0} & ~~~ && 0.0.0.0/0 &&& = &&&& * &&&&& \to\ &&&&&& \text{Default} \\
+            \text{R1} & ~ && 10.0.0.0/8 &&& = &&&& 00001010.* &&&&& \to\ &&&&&& \text{A} \\
+            \text{R2} & ~ && 10.128.0.0/9 &&& = &&&& 00001010.1* &&&&& \to\ &&&&&& \text{B} \\
+            \text{R3} & ~ && 10.64.0.0/10 &&& = &&&& 00001010.01* &&&&& \to\ &&&&&& \text{C} \\
+            \text{R4} & ~ && 192.168.0.0/13 &&& = &&&& 11000000.10101* &&&&& \to\ &&&&&& \text{D} \\
+            \end{align*}
+        \end{center}
+    
+        \begin{figure}[H]
+        \centering
+            \begin{tikzpicture}[
+                regnode/.style={
+                    draw,
+                    fill=blue!10,
+                    minimum width=4.5cm,
+                    minimum height=1.5cm,
+                    align=center
+                },
+                smallreg/.style={
+                    draw,
+                    fill=blue!10,
+                    minimum width=2cm,
+                    minimum height=1.5cm,
+                    align=center
+                },
+                bitbox/.style={
+                    draw,
+                    fill=black,
+                    text=white,
+                    font=\ttfamily\footnotesize,
+                    inner sep=2pt
+                }
+            ]
+    
+    
+            % #1 Name
+            % #2 Position
+            % #3 Label
+            % #4 Left bit text
+            % #5 Right bit text
+            \newcommand{\regnodewithbits}[5]{%
+                \node[regnode,draw=red] (#1) at #2 {#3};
+            
+                \node[bitbox, anchor=south west]
+                    (#1-bitL) at ($(#1.south west)+(2pt,2pt)$) {#4};
+            
+                \node[bitbox, anchor=south east]
+                    (#1-bitR) at ($(#1.south east)+(-2pt,2pt)$) {#5};
+            }
+            
+            % ---------- Nodes ----------
+            \regnodewithbits{R0}{(0,0)}{R0}{00001010}{1100000010101}
+            
+            \node[smallreg,draw=red] (R1) at (-3,-3) {R1};
+            \node[bitbox, anchor=south west]
+                (R1-bitL) at ($(R1.south west)+(2pt,2pt)$) {01};
+            \node[bitbox, anchor=south east]
+                (R1-bitR) at ($(R1.south east)+(-2pt,2pt)$) {1};
+            
+            \node[smallreg] (R4) at (3,-3) {R4};
+            
+            \node[smallreg] (R3) at (-4.2,-5) {R3};
+            \node[smallreg,draw=red] (R2) at (-1.8,-5) {R2};
+            
+            % ---------- Edges (now centered under text) ----------
+            \draw[->,thick,draw=red] (R0-bitL.south) -- (R1.north);
+            \draw[->] (R0-bitR.south) -- (R4.north);
+            
+            \draw[->] (R1-bitL.south) -- (R3.north);
+            \draw[->,thick,draw=red] (R1-bitR.south) -- (R2.north);
+            
+            \end{tikzpicture}
+        \caption{unibit LPM-Trie}
+        \end{figure}
+
+        \begin{center}
+            Routing Packet P1:
+            \begin{align*}
+            \text{P1} & ~~~ && 10.128.12.1 &&& = &&&& \textcolor{red}{00001010.1}0000000.00001100.00000001 &&&&& \to\ &&&&&& \text{R2} \to\ &&&&&&& \text{B} \\
+            \end{align*}
+        \end{center}
+
+    \section{}
+    \subsection{}
+    \begin{center}
+        \begin{tabular}{|c|c|c|}
+            \hline
+            Source & Destination & Destination Port \\
+            \hline 
+            192.168.1.0/24 & Any & 80 \\
+            \textcolor{red}{110} & \textcolor{red}{110} & \textcolor{red}{100} \\
+            \hline
+            Any & 192.168.1.10 & 443 \\
+            \textcolor{red}{001} & \textcolor{red}{001} & \textcolor{red}{010} \\
+            \hline
+            & & 22 \\
+            & & \textcolor{red}{001} \\
+            \hline
+        \end{tabular}
+    \end{center}
+
+
+    
+    \subsection{}
+    \begin{tabular}{|c|c|c|c|l|}
+        \hline
+        Packet & Source & Destination & Destination Port & Action  \\
+        \hline
+        P1 & 192.168.1.0/24 (\textcolor{red}{110}) & Any (\textcolor{red}{110}) & 22 (\textcolor{red}{001}) & $\textcolor{red}{110} \& \textcolor{red}{001} = 000 \to$ Default Rule (Deny)  \\
+        P2 & 192.168.1.0/24 (\textcolor{red}{110}) & Any (\textcolor{red}{110}) & 443 (\textcolor{red}{010}) & $\textcolor{red}{110} \& \textcolor{red}{010} = 010 \to$ Rule 2 (Allow)\\
+        \hline
+    \end{tabular}
+    
+
+    \section{}
+    \subsection{}
+        In comparison to IP prefixes, there is no trivial length identifier for port range. For that reason, TSS classifies ports by nesting levels and range IDs. When multiple filters with different ranges exist, the nesting level (nl) is a quantification for a range, in how many other ranges it is contained. This measure can be used, to identify how specific a filter is, compared to the other filters in the system. It should be noted, that two ranges may not overlap, without one range being completely contained in the other. 
+
+        E.g., there are 4 different ranges: $r_0 = [42, 84]$, $r_1 = [0, 255]$, $r_2 = [50, 56]$ and $r_3 = [210, 222]$, then $r_0$ is contained only in $r_1$, resulting in a nesting level of 1. $r_1$ is contained in no other range, resulting in a nesting level 0. $r_2$ is contained in $r_0$ and $r_1$, resulting in a nesting level of 2. Last, $r_3$ is contained only in $r_1$, leaving it with nesting level 1, same as $r_0$.
+
+        To further differentiate between ranges on the same nesting level (like $r_0$ and $r_3$ in the example above), range IDs were introduced. For each nesting level they start at 0 and are assigned in linear order for existing ranges in that level. In our example, for nestling level 1, $r_0$ would get the range ID 0 and $r_3$ the range ID 1.
+
+        After the above mentioned procedure, every port range is now assigned a unique combination of nesting level and range ID.
+    \subsection{}
+        
+        \begin{tikzpicture}[
+            dashedline/.style={dashed, thick},
+            % Styles mit Argumenten richtig definieren
+            rect/.style args={#1,#2}{
+                draw,
+                fill=blue!10,
+                rectangle,
+                minimum width=#1,
+                minimum height=#2
+            },
+            roundrect/.style args={#1,#2}{
+                draw,
+                fill=red!10,
+                rectangle,
+                rounded corners=8pt,
+                minimum width=#1,
+                minimum height=#2
+            },
+            oval/.style args={#1,#2}{
+                draw,
+                fill=green!10,
+                ellipse,
+                minimum width=#1,
+                minimum height=#2
+            }
+        ]
+
+        \newcommand{\nsDist}{3.1cm}
+        \newcommand{\idDist}{0.2cm}
+        \newcommand{\rangeHight}{1.0cm}
+        \newcommand{\nlLenght}{3.4cm}
+
+
+        \node (nl0r0) at (0,0)  [rect={10cm,\rangeHight}]      {$0 - 65535$};
+        \node (nl0r0id) [roundrect={1.8cm,0.7cm}, below=\idDist of nl0r0]      {Range ID 0};
+
+        \node (nl0) at (9,0) [oval={\nlLenght,\rangeHight}]      {Nesting Level 0};
+
+        \node (nl1r0) at (-3.5,-\nsDist)  [rect={3cm,\rangeHight}]      {$0 - 1023$};
+        \node (nl1r0id) [roundrect={1.8cm,0.7cm}, below=\idDist of nl1r0]      {Range ID 0};
+        \node (nl1r1) at (0,-\nsDist)  [rect={3cm,\rangeHight}]      {$30000 - 40000$};
+        \node (nl1r1id) [roundrect={1.8cm,0.7cm}, below=\idDist of nl1r1]      {Range ID 1};
+        \node (nl1r2) at (3.5,-\nsDist)  [rect={3cm,\rangeHight}]      {$50000 - 60000$};
+        \node (nl1r2id) [roundrect={1.8cm,0.7cm}, below=\idDist of nl1r2]      {Range ID 2};
+
+        \node (nl0) at (9,-\nsDist) [oval={\nlLenght,\rangeHight}]      {Nesting Level 1};
+
+        \node (nl2r0) at (-3.5,-\nsDist*2)  [rect={2.5cm,\rangeHight}]      {$200 - 500$};
+        \node (nl2r0id) [roundrect={1.8cm,0.7cm}, below=\idDist of nl2r0]      {Range ID 0};
+        \node (nl2r1) at (0,-\nsDist*2)  [rect={2.5cm,\rangeHight}]      {$35000 - 38000$};
+        \node (nl2r1id) [roundrect={1.8cm,0.7cm}, below=\idDist of nl2r1]      {Range ID 1};
+
+        \node (nl0) at (9,-\nsDist*2) [oval={\nlLenght,\rangeHight}]      {Nesting Level 2};
+
+        \node (nl1A) at (-6,-\nsDist*0.7)  []      {};
+        \node (nl1B) at (12,-\nsDist*0.7)  []      {};
+        
+        \draw[dashedline] (nl1A) -- (nl1B);
+
+        \node (nl2A) at (-6,-\nsDist*1.7)  []      {};
+        \node (nl2B) at (12,-\nsDist*1.7)  []      {};
+        
+        \draw[dashedline] (nl2A) -- (nl2B);
+        
+        \end{tikzpicture}
+
+    \newpage
+    \subsection{}
+        Possible tuples with format:
+        
+        \begin{center}
+        \[
+        \Bigl[ \text{src IP plen}, \text{dst IP plen}, \text{protocol}, \text{src port nl}, \text{dst port nl} \Bigr]
+        \]
+        \end{center}    
+        
+        %$\begin{bmatrix}
+        %    \text{src IP plen} & \text{dst IP plen} & \text{protocol} & \text{src port nl} & \text{dst port nl} \\
+        %\end{bmatrix}$ 
+        %\\
+
+        and possible hash keys with format:
+
+        \begin{center}
+        \[
+        \Bigl( \text{rnb dst IP} || \text{rnb src IP} || \text{rnb protocol} || \text{src port range ID} || \text{dst port range ID} \Bigr)
+        \]
+        %    (rnb dst IP || rnb src IP || rnb protocol || src port range ID || dst port range ID)
+        \end{center}  
+        
+        where rnb is \glqq\texttt{required number of bits}\grqq{} and \glqq\texttt{rnb protocol}\grqq{} is either * for don't care or a specific protocol number. 
+
+        \begin{minipage}[t]{0.32\textwidth}
+        
+        $\Bigl[ 0 , 0 , 0 , 0 , 0 \Bigr]$
+        
+        \begin{itemize}
+            \item F5 (00*0*)
+        \end{itemize}
+        \end{minipage}
+        \hfill
+        \begin{minipage}[t]{0.32\textwidth}
+        
+        $\Bigl[ 0 , 0 , 0 , 1 , 0 \Bigr]$
+        
+        \begin{itemize}
+            \item F1 (00*0*)
+            \item F2 (00*1*)
+            \item F6 (00*2*)
+        \end{itemize}
+        \end{minipage}
+        \hfill
+        \begin{minipage}[t]{0.32\textwidth}
+        
+        $\Bigl[ 0 , 0 , 0 , 2 , 0 \Bigr]$
+        
+        \begin{itemize}
+            \item F4 (00*0*)
+            \item F3 (00*1*)
+        \end{itemize}
+        \end{minipage}
+        
+    \subsection{}
+
+        Packet P1 with SrcPort = 33000 is classified using the tuple space search algorithm as follows: 
+        
+        \begin{itemize}
+            \item \textbf{RangeID mapping:}
+            \begin{itemize}
+                \item At Nesting Level 2, the port does not fall into any defined range, so there is no Range ID.
+                \item At Nesting Level 1, the port maps to RangeID 1. (The algorithm could terminate here.)
+                \item At Nesting Level 0, the port maps to RangeID 0.
+            \end{itemize}
+            
+            \item \textbf{Tuples probed:}\\
+            Based on the RangeID mapping, the following tuples are probed:
+            \begin{itemize}
+                \item $\Bigl[ 0, 0, 0, 0, 0\Bigr]$
+                \item $\Bigl[ 0, 0, 0, 1, 0\Bigr]$
+            \end{itemize}
+            
+            \item \textbf{Selected filter:}
+            \begin{itemize}
+                \item Both filters F2 and F5 match the packet. Filter F2 is ultimately selected because it has higher priority and a more specific range than F5.
+            \end{itemize}
+        \end{itemize}
+
+
+
+   \section{}
+    See the attached \verb|Question4.nft|, \verb|Question4.py| and \verb|Question4.sh|
+    
+    
+
+
+\end{document}

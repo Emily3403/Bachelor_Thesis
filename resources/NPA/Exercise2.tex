@@ -1,0 +1,183 @@
+%&template
+\documentclass{article}
+\usepackage{src/template}
+
+\endofdump
+\usepackage{minted}
+
+\date{2025 -- 11 -- 02}
+\useTemplate[NPA, Exercise=2]
+\title{NPA -- Exercise 2}
+
+\begin{document}
+\maketitle
+    \section{}
+
+    \subsection{}
+
+    The NVIDIA Collective Communication Library (NCCL), often pronounced \glqq Nickel\grqq, defines five \texttt{Collective Communication Primitives} in its current documentation \cite{nvidia_nccl_docs}. These primitives are listed below and are familiar from the lecture:
+
+    %Collective Communication Primitives
+    \begin{itemize}
+        \item AllReduce 
+        \item Broadcast
+        \item Reduce
+        \item AllGather
+        \item ReduceScatter
+    \end{itemize}
+
+    The \texttt{Broadcast} command replaces the outdated \texttt{Bcast} command, which was previously implemented, thus creating a unified API \cite{hu2025demystifyingncclindepthanalysis}.
+    
+    \subsection{}
+
+    %\begin{itemize}
+    %    %\item RCCL: (AMD)
+    %    \item oneCCL: ML/deep learning on Intel hardware
+    %    \item Gloo: CPU-based distributed training environments.
+    %    %\item TCCL: (Tencent Collective Communication Library)
+    %    \item OCCL: (Deadlock-Free GPU Collective Communication Library)Increases stability and throughput for collective operations in GPU environments.
+    %\end{itemize}
+
+    \subsubsection{\texttt{oneCCL}}
+    The oneCCL is a Collective Communication Library provided by Intel, that focuses on deep learning applications, especially neural network training and the possibility to integrate oneCCL into deep learning frameworks, such as PyTorch \cite{intel-oneccl}. oneCCL supports CPUs and GPUs as devices, but is specially optimized for Intel CPUs \cite{oneapi-spec-oneccl-main_objects}.
+    It is applicable for optimizing a single node with e.g. multiple CPUs and/or GPUs, but also for clusters of multiple nodes. The supported operations are the same as seen for NCCL in (a) \cite{oneapi-spec-oneccl-introduction}.
+
+    \subsubsection{\texttt{Gloo}}
+    GLOO is an open source Collective Communication Library developed by Facebook/Meta. It is specialized for distributed machine learning and often used in e.g. PyTorch frameworks.
+    It is especially useful, when the training is not only done on GPUs, as it supports CPU-only and mixed CPU-GPU tasks, while GPU-only tasks are also possible, while being not as efficient as NCCL \cite{mlarchitect-communication-protocols}.
+    
+    In \cite{app14125100}, Lee et al. state, that GLOO is most efficient, when small data exchanges between nodes are necessary.
+
+    \subsubsection{\texttt{OCCL}}
+    OCCL, whose name is not explicitly resolved, is a deadlock-free library for collective communication between GPUs. It is integrated into a distributed deep learning framework and demonstrated acceptable overheads compared to NCCL \cite{pan2023occldeadlockfreelibrarygpu}. Due to the inherent asynchronicity of GPU cores and streams, collective operations on GPUs are prone to deadlocks. OCCL addresses this Problem by employing a global orchestration of collective calls that dynamically schedules operations across all participating devices \cite{pan2023occldeadlockfreelibrarygpu}.
+    The correctness and performance referred have not been verified by this Homework-Group.
+    
+    
+    \clearpage
+    \section{}
+    \subsection{}
+
+    The data for the following plots has been generated with
+    \begin{verbatim}
+    mpiexec -n 2 python3 mpi-benchmark.py
+    \end{verbatim}
+    
+    \begin{minipage}[h]{0.51\textwidth}
+        \begin{tikzpicture}
+            \begin{axis}[
+                ymode=log, log basis y=10,
+                xmode=log, log basis x=10,
+            %
+                xmax=268435456,
+                ymax=0.1,
+            %
+                grid,
+            %
+                ylabel=Completion time (s),
+                xlabel=Message Size (Bytes),
+                title=AllReduce,
+            ]
+                \addplot table {measurements/allreduce_timing_2ranks.txt};
+            \end{axis}
+        \end{tikzpicture}
+        %
+    \end{minipage}
+    \begin{minipage}[h]{0.49\textwidth}
+        \begin{tikzpicture}
+            \begin{axis}[
+                ymode=log, log basis y=10,
+                xmode=log, log basis x=10,
+            %
+                xmax=268435456,
+                ymax=0.1,
+            %
+                grid,
+            %
+                ylabel=Completion time (s),
+                xlabel=Message Size (Bytes),
+                title=Broadcast,
+            ]
+                \addplot table {measurements/bcast_timing_2ranks.txt};
+            \end{axis}
+        \end{tikzpicture}
+    \end{minipage}
+    \begin{tikzpicture}
+        \begin{axis}[
+            ymode=log, log basis y=10,
+            xmode=log, log basis x=10,
+        %
+            xmax=268435456,
+            ymax=0.1,
+        %
+            grid,
+        %
+            ylabel=Completion time (s),
+            xlabel=Message Size (Bytes),
+            title=AllGather,
+        ]
+            \addplot table {measurements/allgather_timing_2ranks.txt};
+        \end{axis}
+    \end{tikzpicture}
+
+    In all plots, we can observe a linear trend (both axis scale logarithmically) of message size vs. completion time. This is consistent with the lecuture:
+    \begin{align*}
+        T_{\text{Reduce-Scatter}} &= T_{\text{AllGather}}\\
+        T_{\text{AllGather}} &= \log_2(n)\cdot \alpha + m\cdot \beta\\
+        T_{\text{AllReduce}} &= T_{\text{Reduce-Scatter}} + T_{\text{AllGather}}\\
+        T_{\text{Broadcast}} &= 2\cdot \log_2(n) + 2\cdot m \cdot \beta
+    \end{align*}
+
+    In all these formulas the message size $m$ has a linear bandwidth factor, so we would expect the completion time to scale linearly with message size. As we can observe, it does.
+    
+    Another interesting trend we observe is, that for all Graphs the message size of 1024 takes longer to complete than 2048. This is also consistent across multiple runs, so this isn't a random fluctuation.
+    In fact, this has to do with the algorithm that is selected by OpenMPI to facilitate the operation: \href{https://github.com/open-mpi/ompi/blob/3a2e90895e15822912002be1e9aea8032c4c0bae/ompi/mca/coll/tuned/coll_tuned_decision_fixed.c\#L81-L215}{Source}. 
+    
+    Depending on the message size and number of processes, different algorithms get selected. Thus, the constant latency is higher or lower, depending on the algorithm used. This explains the decrease in completion time for higher message size.
+
+
+
+    \subsection{}
+    \subsubsection{\texttt{MPI.COMM\_WORLD}}
+    This is a static reference to a \texttt{Intracomm} object.
+    
+    The purpose of this object is to facilitate communication between the spawned python processes.
+
+    \subsubsection{\texttt{Get\_rank()}}
+    This method returns the rank of this process in a communicator. The rank is a \enquote{worker number}, indicating which ID the current process has.
+
+    The purpose of this method is to determine the ID of the spawned thread in the group.
+
+    \subsubsection{\texttt{Get\_size()}}
+    This method returns the number of processes in a communicator. If we execute \\\verb|mpiexec -n X python3 mpi-benchmark.py|, the output will be \verb|X|.
+
+    The purpose of this method is to determine the number processes spawned.
+
+    \subsubsection{\texttt{Barrier()}}
+    The \texttt{Barrier()} function is a synchronization primitive. Hitting a \texttt{Barrier()} will block the caller until all processes have gotten to this point and called the \texttt{Barrier()}
+
+    The purpose of this function is to wait until all threads are ready.
+
+    \subsubsection{\texttt{Allreduce()}}
+    This is the AllReduce function we encountered during the Lecture.
+
+    This function takes three arguments:
+    \begin{verbatim}
+    sendbuf: BufSpec
+    recvbuf: BufSpec
+    op: Op\end{verbatim}
+    
+    The \texttt{sendbuf} is the data from each process. It is combined with all others to form the result.
+
+    In the \texttt{recvbuf}, the result will be stored. 
+
+    With \texttt{op} one can change the operation performed on the data. 
+    
+
+    
+
+
+
+\bibliographystyle{ieeetr}
+\bibliography{src/references.bib}
+    
+\end{document}

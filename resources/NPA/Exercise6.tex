@@ -1,0 +1,235 @@
+%&template
+\documentclass{article}
+\usepackage{src/template}
+
+\endofdump
+\usepackage{minted}
+
+
+\date{2025 -- 11 -- 30}
+\useTemplate[NPA, Exercise=6]
+\title{NPA -- Exercise 6}
+
+
+\begin{document}
+\maketitle
+    
+    \section{}
+    \subsection{}
+    The AS number is 58611 and AS name is \enquote{CDU-AS-AP Charles Darwin University, AU}
+    
+    \subsection{}
+    \begin{verbatim}
+138.80.0.0/16  *[BGP/170] 1d 01:37:23, localpref 100, from 83.88.52.201
+                 AS path: 3292 7575 58611 I, validation-state: unverified
+    \end{verbatim}
+    This route is marked with a star to indicate it is both the preferred and last active route.
+
+    % Michel 29.11.2025 : 
+    %138.80.0.0/16      *[BGP/170] 5d 10:22:40, localpref 100, from 83.88.49.3
+    %                    AS path: 3292 7575 58611 I, validation-state: unverified
+    %
+    % 83.88.49.3     2001:6c8:40::12    Copenhagen,  Denmark
+    
+    \subsection{}
+    The Prefix announced is \texttt{138.80.0.0/16}.
+    
+    \subsection{}
+    The preferred route has been learned through \texttt{83.88.52.201}. This Router is located in New York. 
+    
+    \subsection{}
+    The AS Path is
+    \begin{align*}
+        &3292,\ \text{\enquote{TDC TDC AS, DK}}\\
+        \to\ & 7575,\ \text{\enquote{AARNET-AS-AP Australian Academic and Research Network AARNet, AU}}\\
+        \to\ &  \texttt{58611},\ \text{\enquote{CDU-AS-AP Charles Darwin University, AU}}
+    \end{align*}
+    
+
+    \subsection{}
+    The raw output is
+    \begin{verbatim}
+        traceroute to 138.80.162.69 (138.80.162.69), 30 hops max, 52 byte packets
+1  ae30-275.slt22nqe1.dk.ip.tdc.net (193.162.154.30)  36.680 ms  0.254 ms  0.194 ms
+2  ae2-0.sjosnqp1.us.ip.tdc.net (83.88.12.129)  151.023 ms  151.020 ms  151.038 ms
+3  xe-0-0-0.bb1.a.pao.aarnet.net.au (198.32.176.177)  151.870 ms  151.886 ms  151.902 ms
+4  et-4-0-5-12.pe1.mcqp.nsw.aarnet.net.au (202.158.194.176)  306.910 ms  306.970 ms  306.916 ms
+ MPLS Label=332 CoS=0 TTL=1 S=1
+5  et-5-1-0.pe1.brwy.nsw.aarnet.net.au (113.197.15.5)  307.137 ms  307.197 ms  307.151 ms
+ MPLS Label=367 CoS=0 TTL=1 S=1
+6  et-0-3-0.pe1.gdpt.qld.aarnet.net.au (113.197.15.17)  322.409 ms  322.342 ms  322.364 ms
+ MPLS Label=144 CoS=0 TTL=1 S=1
+7  et-0-0-0-pe1.mlnr.nt.aarnet.net.au (113.197.14.167)  362.637 ms  362.636 ms  362.562 ms
+8  138.44.208.34 (138.44.208.34)  362.630 ms  362.640 ms  362.607 ms
+9  fgtcasfw2.routing.cdu.edu.au (138.80.0.250)  362.730 ms  362.480 ms  362.472 ms
+10  cbl2c1core1.routing.cdu.edu.au (138.80.5.105)  362.796 ms  362.763 ms  362.886 ms
+11  * * *
+12  www.cdu.edu.au (138.80.162.69)  362.772 ms  362.697 ms  362.788 ms
+    \end{verbatim}
+
+    Chain of IPs: 
+    \begin{align*}
+        &\text{Hop1:} && 193.162.154.30 &&& AS(3292) &&&& \text{Denmark Midtjylland} \\
+        \to\ &\text{Hop2:} && 83.88.12.129 &&& AS(3292) &&&& \text{Unknown, probably New York} \\
+        \to\ &\text{Hop3:} && 198.32.176.177 &&& AS(7575) &&&& \text{United States, California, Palo Alto} \\
+        \to\ &\text{Hop4:} && 202.158.194.176 &&& AS(7575) &&&& \text{Australia Sydney}\\
+        \to\ &\text{Hop5:} && 113.197.15.5 &&& AS(7575) &&&& \text{Australia Sydney}\\
+        \to\ &\text{Hop6:} && 113.197.15.17 &&& AS(7575) &&&& \text{Australia Brisbane} \\
+        \to\ &\text{Hop7:} && 113.197.14.167 &&& AS(7575) &&&& \text{Australia near Darwin}\\
+        \to\ &\text{Hop8:} && 138.44.208.34 &&& AS(7575) &&&& \text{Australia Darwin, access to Campus}\\
+        \to\ &\text{Hop9:} && 138.80.0.250 &&& AS(58611) &&&& \text{Australia Darwin, Firewall-Cluster from CDU}\\
+        \to\ &\text{Hop10:} && 138.80.5.105 &&& AS(58611) &&&& \text{Australia Darwin, Campus-Backbone-Core-Router}\\
+        \to\ &\text{Hop11:} && ??? &&& AS(58611) &&&& \text{no answer from Router}\\
+        \to\ &\text{Hop12:} && 138.80.162.69 &&& AS(58611) &&&& \text{Australia Darwin, Target}\\
+    \end{align*}
+
+
+%    \begin{tikzpicture}[
+%        AS/.style={draw, dashed, ellipse, minimum height=40pt,minimum width=70pt},
+%        Router/.style={draw, },
+%        Link/.style={draw, },
+%    ]
+%        \node[AS] (AS3292) at (0, 0) {AS 3292};
+%        \node[AS] (AS) at (3, 0) {};
+%
+%    \end{tikzpicture}
+
+
+    \begin{figure}[H]
+    \centering
+        \begin{tikzpicture}[scale=1,
+                            AS/.style={draw=teal, dashed, ellipse, minimum height=40pt,minimum width=70pt},
+                            Router/.style={font=\tiny},
+                            Link/.style={font=\tiny},
+                            Location/.style={font=\tiny}]
+
+            % Hintergrund
+            \node[anchor=south west, inner sep=0] (map) at (0,0)
+                {\includegraphics[width=\textwidth]{images/world}};
+            
+            % Koordinaten!
+            \coordinate (Denmark) at (8.2,6.50);
+            \coordinate (PaloAlto) at (3.3,5.7);
+            \coordinate (NewYork) at (5.3,5.9);
+            \coordinate (Sydney) at (14.6,2.1);
+            \coordinate (Brisbane) at (14.7,2.5);
+            \coordinate (Darwin) at (13.6,3.2);
+
+            \foreach \p in {Denmark,PaloAlto,Sydney,NewYork,Brisbane,Darwin}{
+                \fill[blue] (\p) circle (3pt);
+            }
+            \node[Location, blue, above] at (Denmark) {Denmark};
+            \node[Location, blue, left] at (PaloAlto) {PaloAlto};
+            \node[Location, blue, left] at (NewYork) {NewYork ?};
+            \node[Location, blue, above] at (Sydney) {Sydney};
+            \node[Location, blue, above] at (Brisbane) {Brisbane};
+            \node[Location, blue, left] at (Darwin) {Darwin};
+            %\draw[red, thick] (Denmark) -- (California) -- (Sydney) -- (Perth) -- (Darwin);
+
+            % Router
+            \coordinate (Hop1) at ($(Denmark) + (0.1,-0.1)$); % (horizontal,vertikal)
+                \fill[teal] (Hop1) circle (2pt);
+                \node[Router, below, text=teal] at (Hop1) {193.162.154.30};
+                
+            \coordinate (Hop2) at ($(NewYork) + (0,-0.1)$); % (horizontal,vertikal)
+                \fill[teal] (Hop2) circle (2pt);
+                \node[Router, below, text=teal] at (Hop2) {83.88.12.129};
+
+            \coordinate (Hop3) at ($(PaloAlto) + (0.1,-0.1)$); % (horizontal,vertikal)
+                \fill[brown] (Hop3) circle (2pt);
+                \node[Router, below, text=brown] at (Hop3) {198.32.176.177};
+
+            \coordinate (Hop4) at ($(Sydney) + (0.1,-0.1)$); % (horizontal,vertikal)
+                \fill[brown] (Hop4) circle (2pt);
+                \node[Router, anchor=north west, text=brown] at (Hop4) {202.158.194.176};
+
+            \coordinate (Hop5) at ($(Sydney) + (-0.1,0)$); % (horizontal,vertikal)
+                \fill[brown] (Hop5) circle (2pt);
+                \node[Router, left, text=brown] at (Hop5) {113.197.15.5};
+
+            \coordinate (Hop6) at ($(Brisbane) + (0,0.1)$); % (horizontal,vertikal)
+                \fill[brown] (Hop6) circle (2pt);
+                \node[Router, right, text=brown] at (Hop6) {113.197.15.17};
+                
+            \coordinate (Hop7) at ($(Darwin) + (0.3,-0.3)$); % (horizontal,vertikal)
+                \fill[brown] (Hop7) circle (2pt);
+                \node[Router, right, text=brown] at (Hop7) { 113.197.14.167};
+                
+            \coordinate (Hop8) at ($(Darwin) + (0.2,-0.1)$); % (horizontal,vertikal)
+                \fill[brown] (Hop8) circle (2pt);
+                \node[Router, right, text=brown] at (Hop8) {138.44.208.34};
+
+            \coordinate (Hop9) at ($(Darwin) + (0.1,0)$); % (horizontal,vertikal)
+                \fill[violet] (Hop9) circle (2pt);
+                \node[Router, anchor=south west, text=violet] at (Hop9) {138.80.0.250};
+
+            \coordinate (Hop10) at ($(Darwin) + (0,-0.1)$); % (horizontal,vertikal)
+                \fill[violet] (Hop10) circle (2pt);
+                \node[Router, anchor=north east, text=violet] at (Hop10) {138.80.5.105};
+                
+            \coordinate (Hop11) at ($(Darwin) + (-0.1,0)$); % (horizontal,vertikal)
+                \fill[violet] (Hop11) circle (2pt);
+                \node[Router, anchor=south east, text=violet] at (Hop11) {138.80.162.69};
+                
+            % AS
+            \node[AS, thick, fit=(Hop1) (Hop2), inner sep=8pt, text=teal] (AS3292) {AS3292};
+            \node[AS, draw=brown, thick, ellipse, text=brown, fit=(Hop3) (Hop4) (Hop5) (Hop6) (Hop7) (Hop8)] (AS7575) {AS7575};
+            \node[AS, draw=violet, thick, ellipse, text=teal, fit=(Hop9) (Hop10) (Hop11)] (AS58611) {};
+            \node[above=20pt, text=violet] at (AS58611.west) {AS58611};
+
+
+            \def\t{0.5}  % Mitte
+            \def\h{1}    % Höhe des Bogens
+            
+            % routs
+            \coordinate (CP1) at ($(Hop1)!\t!(Hop2) + (0,\h)$);
+            \draw[Link, red] (Hop1) .. controls (CP1) .. node[midway, above] {138.651 ms} (Hop2);
+
+            \coordinate (CP2) at ($(Hop2)!\t!(Hop3) + (0,\h)$);
+            \draw[Link, red] (Hop2) .. controls (CP2) .. node[midway, above] {0.859 ms} (Hop3);
+            
+            \coordinate (CP3) at ($(Hop3)!0.95!(Hop4) - (0,\h*2)$);
+            \draw[Link, red] (Hop3) .. controls (CP3) .. node[midway, below, sloped] {155.046 ms} (Hop4);
+
+            \coordinate (CP4) at ($(Hop4)!\t!(Hop5) - (0,\h*0.2)$);
+            \draw[Link, red] (Hop4) .. controls (CP4) .. node[midway, left] {0.230 ms} (Hop5);
+
+            \coordinate (CP5) at ($(Hop5)!\t!(Hop6) + (-1,\h*0)$);
+            \draw[Link, red] (Hop5) .. controls (CP5) .. node[midway, left] {15.210 ms} (Hop6);
+
+            \coordinate (CP6) at ($(Hop6)!\t!(Hop7) + (0,\h*1.2)$);
+            \draw[Link, red] (Hop6) .. controls (CP6) .. node[midway, right] {40.240 ms} (Hop7);
+
+            \coordinate (CP7) at ($(Hop7)!\t!(Hop8) + (0,\h*1.2)$);
+            \draw[Link, red] (Hop7) .. controls (CP7) .. node[midway, right] {0.014 ms} (Hop8);
+
+            \coordinate (CP8) at ($(Hop8)!\t!(Hop9) + (0,\h*1.3)$);
+            \draw[Link, red] (Hop8) .. controls (CP8) .. node[midway, right] {$\sim$0 ms} (Hop9);
+
+            \coordinate (CP7) at ($(Hop9)!\t!(Hop10) + (0,\h*1.6)$);
+            \draw[Link, red] (Hop9) .. controls (CP7) .. node[midway, right] {0.254 ms} (Hop10);
+
+            \coordinate (CP8) at ($(Hop10)!\t!(Hop11) + (0,\h*1.9)$);
+            \draw[Link, red] (Hop10) .. controls (CP8) .. node[midway, right] {$\sim$0 ms} (Hop11);
+
+
+        
+        \end{tikzpicture}
+    \caption{Worldmap-Traceroute}
+    \end{figure}
+
+    \subsection{}
+
+    In the traceroute from Denmark to CDU, the packets go through the USA, crossing two oceans before reaching Australia.
+    The route from TU Berlin is different: it starts in Germany, goes through the local academic network (DFN), and then uses the European GÉANT backbone to reach Australia.
+    Both routes use AARNet to reach CDU in Australia.
+    The TU Berlin route also shows several hops marked with \glqq * \grqq{} (ICMP timeouts), which may mean the routers block or deprioritize ICMP, even though the packets are still forwarded correctly.
+    Overall, the RTT from TU Berlin was faster.
+    
+    \subsection{}
+
+    One reason for the differences is the path the packets take through different networks. The TU Berlin route uses academic networks like DFN and GÉANT, which are direct and optimized to reach Australia via AARNet. The public server route goes through commercial networks and the USA, making the path longer.
+    
+    Another reason is the round-trip times (RTTs). The TU Berlin route has lower RTTs because the packets travel shorter and more direct paths, while the public server route has higher RTTs due to extra hops and ocean crossings.
+
+\end{document}

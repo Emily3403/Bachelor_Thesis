@@ -1,0 +1,323 @@
+%&template
+\documentclass{article}
+\usepackage{src/template}
+
+\endofdump
+\usepackage{minted}
+
+\date{2025 -- 12 -- 07}
+\useTemplate[NPA, Exercise=7]
+\title{NPA -- Exercise 7}
+
+
+\begin{document}
+\maketitle
+    
+    \section{}
+\begin{verbatim}
+#!/usr/bin/env bash
+# Group Q: 
+#  Emily Seebeck - 411364
+#  Michel Schnitker - 410230
+#  Jarne Bärmann - 409434
+#  Raphael Krafczyk - 393325
+
+# exercise a)
+for ns in R1 R2 R3 R4 R5 H1 H2; do
+    ip netns del $ns 2>/dev/null
+done
+
+for ns in R1 R2 R3 R4 R5 H1 H2; do
+    ip netns add $ns
+done
+
+# DEBUG: list namespaces so we know they were created
+
+# ip netns list
+# echo ""
+
+# exercise b)
+ip link add vH1-R1 type veth peer name vR1-H1
+ip link add vH2-R5 type veth peer name vR5-H2
+ip link add vR1-R2 type veth peer name vR2-R1
+ip link add vR1-R4 type veth peer name vR4-R1
+ip link add vR2-R3 type veth peer name vR3-R2
+ip link add vR3-R5 type veth peer name vR5-R3
+ip link add vR5-R4 type veth peer name vR4-R5
+
+ip link set vH1-R1 netns H1
+ip link set vH2-R5 netns H2
+ip link set vR1-R2 netns R1
+ip link set vR1-R4 netns R1
+ip link set vR1-H1 netns R1
+ip link set vR2-R1 netns R2
+ip link set vR2-R3 netns R2
+ip link set vR3-R5 netns R3
+ip link set vR3-R2 netns R3
+ip link set vR4-R5 netns R4
+ip link set vR4-R1 netns R4
+ip link set vR5-R4 netns R5
+ip link set vR5-H2 netns R5
+ip link set vR5-R3 netns R5
+
+# DEBUG: Output for b)
+
+# list links for each NS
+# for NAMESPACE in R1 R2 R3 R4 R5 H1 H2; do
+#     echo $NAMESPACE
+#     sudo ip netns exec $NAMESPACE ip -br a
+#     echo ""
+# done
+
+
+# exercise c) Configure ips
+# Convention: IP ending with .20X for each Router RX
+# Router loopbacks: fc00:X::1/128 where X is the router number
+# Host IP ending with .X for HX
+
+# H1
+ip netns exec H1 ip addr add 2001:db8:1::1/64 dev vH1-R1
+ip netns exec H1 ip link set dev vH1-R1 up
+ip netns exec H1 ip link set lo up
+
+# R1
+ip netns exec R1 ip addr add 2001:db8:1::201/64 dev vR1-H1
+ip netns exec R1 ip addr add 2001:db8:2::201/64 dev vR1-R2
+ip netns exec R1 ip addr add 2001:db8:4::201/64 dev vR1-R4
+
+
+ip netns exec R1 ip link set dev vR1-H1 up
+ip netns exec R1 ip link set dev vR1-R2 up
+ip netns exec R1 ip link set dev vR1-R4 up
+ip netns exec R1 ip link set dev lo up
+
+# R2
+ip netns exec R2 ip addr add 2001:db8:2::202/64 dev vR2-R1
+ip netns exec R2 ip addr add 2001:db8:3::202/64 dev vR2-R3
+
+
+ip netns exec R2 ip link set dev vR2-R1 up
+ip netns exec R2 ip link set dev vR2-R3 up
+ip netns exec R2 ip link set dev lo up
+
+# R3
+ip netns exec R3 ip addr add 2001:db8:3::203/64 dev vR3-R2
+ip netns exec R3 ip addr add 2001:db8:5::203/64 dev vR3-R5
+
+
+ip netns exec R3 ip link set dev vR3-R2 up
+ip netns exec R3 ip link set dev vR3-R5 up
+ip netns exec R3 ip link set dev lo up
+
+# R5
+ip netns exec R5 ip addr add 2001:db8:7::205/64 dev vR5-H2
+ip netns exec R5 ip addr add 2001:db8:5::205/64 dev vR5-R3
+ip netns exec R5 ip addr add 2001:db8:6::205/64 dev vR5-R4
+
+
+ip netns exec R5 ip link set dev vR5-H2 up
+ip netns exec R5 ip link set dev vR5-R3 up
+ip netns exec R5 ip link set dev vR5-R4 up
+ip netns exec R5 ip link set dev lo up
+
+# R4
+ip netns exec R4 ip addr add 2001:db8:4::204/64 dev vR4-R1
+ip netns exec R4 ip addr add 2001:db8:6::204/64 dev vR4-R5
+
+
+ip netns exec R4 ip link set dev vR4-R1 up
+ip netns exec R4 ip link set dev vR4-R5 up
+ip netns exec R4 ip link set dev lo up
+
+# H2
+ip netns exec H2 ip addr add 2001:db8:7::2/64 dev vH2-R5
+ip netns exec H2 ip link set dev vH2-R5 up
+ip netns exec H2 ip link set lo up
+
+
+# DEBUG: Output for c)
+# for NAMESPACE in R1 R2 R3 R4 R5 H1 H2; do
+#     echo $NAMESPACE
+#     sudo ip netns exec $NAMESPACE ip a
+#     echo ""
+# done
+
+# exercise d) Default Routes
+ip netns exec H1 ip -6 route add default via 2001:db8:1::201
+ip netns exec H2 ip -6 route add default via 2001:db8:7::205
+
+# exercise e) Router Loopback Addresses
+ip netns exec R1 ip addr add fc00:1::1/128 dev lo
+ip netns exec R2 ip addr add fc00:2::1/128 dev lo
+ip netns exec R3 ip addr add fc00:3::1/128 dev lo
+ip netns exec R5 ip addr add fc00:5::1/128 dev lo
+ip netns exec R4 ip addr add fc00:4::1/128 dev lo
+
+
+# exercise f) define a route for each sid
+
+# R1
+ip netns exec R1 ip -6 route add fc00:2::1/128 via 2001:db8:2::202
+ip netns exec R1 ip -6 route add fc00:4::1/128 via 2001:db8:4::204
+
+# R2
+ip netns exec R2 ip -6 route add fc00:1::1/128 via 2001:db8:2::201
+ip netns exec R2 ip -6 route add fc00:3::1/128 via 2001:db8:3::203
+
+# R3
+ip netns exec R3 ip -6 route add fc00:2::1/128 via 2001:db8:3::202
+ip netns exec R3 ip -6 route add fc00:5::1/128 via 2001:db8:5::205
+
+# R5
+ip netns exec R5 ip -6 route add fc00:3::1/128 via 2001:db8:5::203
+ip netns exec R5 ip -6 route add fc00:4::1/128 via 2001:db8:6::204
+
+# R4
+ip netns exec R4 ip -6 route add fc00:1::1/128 via 2001:db8:4::201
+ip netns exec R4 ip -6 route add fc00:5::1/128 via 2001:db8:6::205
+
+
+# exercise g) enable forwarding on router
+
+sysctl -w net.ipv6.conf.all.seg6_enabled=1
+sysctl -w net.ipv6.conf.default.seg6_enabled=1
+
+for ROUTER in R1 R2 R3 R4 R5; do
+    ip netns exec $ROUTER sysctl -w net.ipv6.conf.all.forwarding=1
+    ip netns exec $ROUTER sysctl -w net.ipv6.conf.all.seg6_enabled=1
+done
+
+ip netns exec R1 sysctl -w net.ipv6.conf.vR1-H1.seg6_enabled=1
+ip netns exec R1 sysctl -w net.ipv6.conf.vR1-R2.seg6_enabled=1
+ip netns exec R1 sysctl -w net.ipv6.conf.vR1-R4.seg6_enabled=1
+
+ip netns exec R2 sysctl -w net.ipv6.conf.vR2-R1.seg6_enabled=1
+ip netns exec R2 sysctl -w net.ipv6.conf.vR2-R3.seg6_enabled=1
+
+ip netns exec R3 sysctl -w net.ipv6.conf.vR3-R2.seg6_enabled=1
+ip netns exec R3 sysctl -w net.ipv6.conf.vR3-R5.seg6_enabled=1
+
+ip netns exec R4 sysctl -w net.ipv6.conf.vR4-R1.seg6_enabled=1
+ip netns exec R4 sysctl -w net.ipv6.conf.vR4-R5.seg6_enabled=1
+
+ip netns exec R5 sysctl -w net.ipv6.conf.vR5-H2.seg6_enabled=1
+ip netns exec R5 sysctl -w net.ipv6.conf.vR5-R3.seg6_enabled=1
+ip netns exec R5 sysctl -w net.ipv6.conf.vR5-R4.seg6_enabled=1
+
+# DEBUG: Output for g)
+# for ROUTER in R1 R2 R3 R4 R5; do
+#     ip netns exec $ROUTER ip a
+# done
+
+# exercise h) End Action
+ip netns exec R1 ip route add fc00:1::1/128 encap seg6local action End dev lo
+ip netns exec R2 ip route add fc00:2::1/128 encap seg6local action End dev lo
+ip netns exec R3 ip route add fc00:3::1/128 encap seg6local action End dev lo
+ip netns exec R4 ip route add fc00:4::1/128 encap seg6local action End dev lo
+ip netns exec R5 ip route add fc00:5::1/128 encap seg6local action End dev lo
+
+
+# exercise i) Routing
+ip netns exec R1 ip -6 route add 2001:db8:7::/64 encap seg6 mode encap segs fc00:2::1,fc00:3::1,fc00:5::1 dev vR1-R2
+ip netns exec R5 ip -6 route add 2001:db8:1::/64 encap seg6 mode encap segs fc00:4::1,fc00:1::1 dev vR5-R4
+
+# exercise j) Ping Test
+
+ip netns exec H1 ping6 -c 5 2001:db8:7::2
+
+# PING 2001:db8:7::2(2001:db8:7::2) 56 data bytes
+# 64 bytes from 2001:db8:7::2: icmp_seq=1 ttl=63 time=0.101 ms
+# 64 bytes from 2001:db8:7::2: icmp_seq=2 ttl=63 time=0.146 ms
+# 64 bytes from 2001:db8:7::2: icmp_seq=3 ttl=63 time=0.131 ms
+# 64 bytes from 2001:db8:7::2: icmp_seq=4 ttl=63 time=0.124 ms
+# 64 bytes from 2001:db8:7::2: icmp_seq=5 ttl=63 time=0.126 ms
+
+# --- 2001:db8:7::2 ping statistics ---
+# 5 packets transmitted, 5 received, 0% packet loss, time 4073ms
+# rtt min/avg/max/mdev = 0.101/0.125/0.146/0.014 ms
+
+# exercise k) capture traffic
+
+echo -e "\n\nStarting tcpdump..."
+
+for ROUTER in R1 R2 R3 R4 R5; do
+    ip netns exec $ROUTER ip -o link show | awk -F': ' '{print $2}' | sed 's/@.*$//' | grep -v '^lo$' | while read -r IF; do
+        ip netns exec $ROUTER tcpdump -v -n -w $ROUTER_$IF.pcap -i $IF &
+    done
+done
+
+sleep 1
+
+echo -e "\n\nStarting ping..."
+
+NUM_PINGS=5
+ip netns exec H1 ping6 -c $NUM_PINGS 2001:db8:7::2
+
+sleep $(($NUM_PINGS+3))
+killall tcpdump
+
+
+
+# exercise l) tshark
+
+
+
+verify_requests() {
+    # $1 = filename
+    if [ $(tshark -r "$1" -Y "icmpv6.type == 128" | wc -l) == 0 ]; then
+        echo "tshark output in $1 contains no icmp requests where some should have been"
+        exit 1
+    fi
+}
+
+verify_no_requests() {
+    if [ $(tshark -r "$1" -Y "icmpv6.type == 128" | wc -l) != 0 ]; then
+        echo "tshark output in $1 contains icmp requests where none should have been"
+        exit 1
+    fi
+}
+
+verify_responses() {
+    if [ $(tshark -r "$1" -Y "icmpv6.type == 129" | wc -l) == 0 ]; then
+        echo "tshark output in $1 contains no icmp responses where some should have been"
+        exit 1
+    fi
+}
+
+verify_no_responses() {
+    if [ $(tshark -r "$1" -Y "icmpv6.type == 129" | wc -l) != 0 ]; then
+        echo "tshark output in $1 contains icmp responses where none should have been"
+        exit 1
+    fi
+}
+
+# Request: H1 → H2
+verify_requests "vR1-H1.pcap"
+verify_responses "vR1-H1.pcap"
+
+verify_requests "vR1-R2.pcap"
+verify_no_responses "vR1-R2.pcap"
+
+verify_requests "vR2-R3.pcap"
+verify_no_responses "vR2-R3.pcap"
+
+verify_requests "vR3-R5.pcap"
+verify_no_responses "vR3-R5.pcap"
+
+verify_requests "vR5-H2.pcap"
+verify_responses "vR5-H2.pcap"
+
+# Reply: H2 → H1
+verify_no_requests "vR5-R4.pcap"
+verify_responses "vR5-R4.pcap"
+
+verify_no_requests "vR4-R1.pcap"
+verify_responses "vR4-R1.pcap"
+
+echo "OK"
+
+
+\end{verbatim}
+
+
+\end{document}

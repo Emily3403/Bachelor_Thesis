@@ -1,0 +1,13 @@
+\documentclass{article}
+
+\immediate\write18{
+    pdflatex -ini -jobname="template" "&pdflatex" mylatexformat.ltx "_compile.tex"
+        && echo "Format file successfully generated." > compile-out.tex
+        || echo "Format file could not be generated." > compile-out.tex
+}
+
+\usepackage{verbatim}
+
+\begin{document}
+    \verbatiminput{compile-out.tex}
+\end{document}
