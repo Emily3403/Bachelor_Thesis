@@ -6,7 +6,47 @@
     \clearpage
     \section{Introduction}
 
-    In this thesis, we want to have a look at the standard kernel User I/O framework and how to integrate it with the FIQ Interrupt on the ARM Architecture. The FIQ Interrupt is of particular note as it is \enquote{reserved for a single, high-priority interrupt source that requires a guaranteed fast response time}\footnote{https://developer.arm.com/documentation/den0013/d/Exception-Handling/Exception-priorities/FIQ-and-IRQ}.
+    In this Thesis, we want to explore the standard kernel User I/O (\UIO) framework and discuss possibilities of integrating the FIQ Interrupt on ARM \blindCite. We will be using the \href{https://www.raspberrypi.com/products/raspberry-pi-4-model-b/specifications/}{Raspberry Pi 4 Model B Rev 1.5} as it contains all vital pieces of hardware to do the benchmarking correctly and accurately.
+
+    In order to cite the use of AI properly, it is integrated as a \enquote{Live}-Chat into the thesis. Whenever it was relevant to ask the AI, the \textcolor{Orchid}{Question} and \textcolor{red}{Answer} (word-for-word or excerpt) will be provided and shown. Blackbox.ai was used for providing the \textcolor{red}{GPT-5.5} Model.
+
+    \AICite{Hey, I'm new to this. I don't know what the FIQ Interrupt is on ARM and what Benefits it has in comparison towards a \enquote{normal} IRQ in x86-64 / arm64?}{FIQ = Fast Interrupt reQuest. It is an ARM interrupt type intended for very low-latency, high-priority interrupt handling. \AIParen{} FIQ is not really an x86-64 concept, it has normal maskable interrupts, NMIs, SMIs, APIC priority levels, etc., but there is no exact direct equivalent to ARM FIQ.}
+    %My Answer: {The FIQ Interrupt is of particular note as it is \enquote{reserved for a single, high-priority interrupt source that requires a guaranteed fast response time}\footnote{https://developer.arm.com/documentation/den0013/d/Exception-Handling/Exception-priorities/FIQ-and-IRQ}.}
+    %
+
+    \textsc{Now}, the interesting question becomes, \textbf{how} does ARM do this?\lf
+    \textit{By implementing the entire Architecture from scratch and introducing this concept.}\lf
+    This is only possible because the Architecture (\texttt{ARM-7} / \texttt{RISC-V}) isn't clogged by decades of legacy.
+
+
+    \bigskip
+
+
+    \subsection{\GPT5 and the \ARM{} Architecture}
+
+    We train our specialized \AI{} model with \GPT5 and the following data
+
+    \begin{itemize}
+        \item \CPU: \Cortex
+        \item \MEM: 8 \GB
+        \item \MAC: \verb|d8:3a:dd:46:f2:81|
+    \end{itemize}
+
+    \url{https://developer.arm.com/documentation/ddi0487/gb/}
+
+    \url{https://pip-assets.raspberrypi.com/categories/545-raspberry-pi-4-model-b/documents/RP-008248-DS-1-bcm2711-peripherals.pdf}
+
+    \TODO[Other sources]
+
+
+    ---
+
+    Trained with this data, \GPT5 is able to answer all questions related to the Raspberry Pi 4 B and the \ARM{} architecture. Let's call them Stephan [Bauroth <\url{s.bauroth@tu-berlin.de}>].
+
+    
+    \subsection{New}
+
+
 
     % Arguments:
     %   - Higher Prio, won't be disabled

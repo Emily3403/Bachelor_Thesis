@@ -16,11 +16,11 @@ pub struct Packet {
     pub checksum: u8, // Pop count, only over [data]
     pub data: Vec<u8>,
 
-    pub errors: PacketErrors,
+    // pub errors: PacketErrors,
+    pub errors: u32,
 }
 
 bitflags! {
-    #[derive(Serialize, Deserialize)]
     pub struct PacketErrors: u8 {
         const CHECKSUM_MISMATCH = 0b0001;
         const SEQNUM_MISMATCH   = 0b0010;
@@ -35,7 +35,8 @@ impl Display for Packet {
 
 impl Packet {
     pub fn is_valid(&self) -> bool {
-        self.errors.is_empty()
+        // self.errors.is_empty()
+        true
     }
 
     pub fn new(seq_num: u8, last_seq_num: u8, checksum: u8, data: Vec<u8>) -> Self {
@@ -55,7 +56,7 @@ impl Packet {
             seq_num,
             checksum,
             data,
-            errors: PacketErrors::empty(),
+            errors: 0,
         }
     }
 }

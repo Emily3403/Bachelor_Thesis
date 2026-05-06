@@ -331,12 +331,15 @@
 }
 
 \newcommand{\TODO}[1][]{\todo[#1]}
-\newcommand{\todo}[1][]{\textcolor{red}{\if\relax\detokenize{#1}\relax TODO\fi #1}}
+\newcommand{\todo}[1][]{\textcolor{red}{\if\relax\detokenize{#1}\relax TODO\fi TODO: #1}}
 \newcommand{\ToDo}[1][]{\TODO[#1]}
 
 % Now get the things of the other template files.
 \RequirePackage{templateMedium}
 \RequirePackage{templateAll}
+
+% Specific for this thesis:
+\RequirePackage{templateBA}
 
 % -/- General purpose macros ---
 

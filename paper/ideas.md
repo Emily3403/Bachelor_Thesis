@@ -12,7 +12,7 @@
   - Kernel Debugging ist *schwer*
 - Hinkriegen durch Userspace Treiber
 - Sind mitunter sehr langsam
-- Speedup durch besseren FIQ / IRQ Stack
+- Speedup durch besseren FIQ / IRQ Stac
 - Diese Technik erlaubt es Treiber, die klassischerweise im Kernel wegen low-latency laufen müssten, in den userspace ausgelagert zu werden
   - Caveat: Da nur eine Interrupt Source unterstützt wird, kann auch immer nur genau ein Treiber in den userspace ausgelagert werden
   - Vielleicht gilt das wegen IRQs dann nicht mehr
