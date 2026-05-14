@@ -52,24 +52,6 @@ enum {
     IRQ_TX = 0b10,
 };
 
-static void enable_interrupts(void *mem, struct uio_uart_priv *priv, bool is_tx) {
-    if (is_tx)
-        priv->enabled_interrupts |= IRQ_TX;
-    else
-        priv->enabled_interrupts |= IRQ_RX;
-
-    iowrite8(priv->enabled_interrupts, mem + AUX_MU_IER_REG);
-}
-
-static void disable_interrupts(void *mem, struct uio_uart_priv *priv, bool is_tx) {
-    if (is_tx)
-        priv->enabled_interrupts &= ~IRQ_TX;
-    else
-        priv->enabled_interrupts &= ~IRQ_RX;
-
-    iowrite8(priv->enabled_interrupts, mem + AUX_MU_IER_REG);
-}
-
 static irqreturn_t uio_uart_handler(int irq, struct uio_info *info) {
     struct uio_uart_priv *priv = info->priv;
     void __iomem *mem = info->mem[0].internal_addr;
@@ -87,46 +69,10 @@ static irqreturn_t uio_uart_handler(int irq, struct uio_info *info) {
     if (iir & 0b100) {
         // RX
         u8 data = ioread8(mem + AUX_MU_IO_REG);
-
-        // u8 prev_data = ioread8(mem + AUX_MU_SCRATCH);
-        // if (prev_data != 0) {
-        //     priv->total_overflows++;
-        //     if (priv->total_overflows % 10 == 0)
-        //         printk(KERN_INFO "ERROR: receiver overflow\n");
-        //
-        //     iowrite8(0b11, mem + AUX_MU_IIR_REG);
-        // }
-        //
-
-        unsigned int lsr = ioread8(mem + AUX_MU_LSR_REG);
-
-        if (lsr & 0b10) {
-            priv->total_overflows++;
-            if (priv->total_overflows % 10 == 0)
-                printk(KERN_INFO "ERROR: receiver overflow\n");
-
-            iowrite8(0b11, mem + AUX_MU_IIR_REG);
-        }
-
         iowrite8(data, mem + AUX_MU_SCRATCH);
     }
 
     return IRQ_HANDLED;
-}
-
-static int uio_uart_irqcontrol(struct uio_info *info, s32 irq_on) {
-    struct uio_uart_priv *priv = info->priv;
-    void __iomem *mem = info->mem[0].internal_addr;
-
-    if (irq_on) {
-        enable_interrupts(mem, priv, false);
-    }
-    else {
-        disable_interrupts(mem, priv, false);
-        disable_interrupts(mem, priv, true);
-    }
-
-    return 0;
 }
 
 static int uio_uart_probe(struct platform_device *pdev) {
@@ -156,7 +102,7 @@ static int uio_uart_probe(struct platform_device *pdev) {
     info->mmap = NULL;
     info->open = NULL;                       // TODO: Make this a function to enable interrupts for the UART
     info->release = NULL;                    // TODO
-    info->irqcontrol = uio_uart_irqcontrol;  // TODO
+    info->irqcontrol = NULL;  // TODO
 
     BUG_ON(pdev->num_resources == 0);
     WARN_ON(pdev->num_resources > 1);
