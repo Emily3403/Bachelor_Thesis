@@ -1,0 +1,61 @@
+43233a1 HEAD@{0}: pull --rebase (finish): returning to refs/heads/main
+43233a1 HEAD@{1}: pull --rebase (pick): WIP Sync
+e67ed63 HEAD@{2}: pull --rebase (start): checkout e67ed63fccd6caa667ad2983e04d2a8d3ce8bd40
+ef57c9a HEAD@{3}: commit: WIP Sync
+2762a87 HEAD@{4}: commit: Modified: paper/Thesis.pdf
+d7fd508 HEAD@{5}: commit: Modified: paper/Thesis.pdf
+53a02ff HEAD@{6}: commit: Modified: paper/target/main.log paper/Thesis.pdf
+e7b1146 HEAD@{7}: commit: Add Thesis Paper
+93cecac HEAD@{8}: commit: Added: paper/.gitignore Modified: paper/main.tex paper/target/main.log paper/target/main.pdf paper/target/main.synctex.gz
+3069e32 HEAD@{9}: reset: moving to HEAD
+3069e32 HEAD@{10}: reset: moving to HEAD
+3069e32 HEAD@{11}: commit: NPA Course from 411364
+00f23d4 HEAD@{12}: commit: Added: resources/JJ/Language.pdf
+7115f0c HEAD@{13}: commit: 2020 rip dump
+6e18ac8 HEAD@{14}: commit: Added: resources/Bio/Muntermacher Maja \342\234\250.md resources/Wer Anders [IDK WHO]/berechnung_dichte_milch_rahm_und_volumenstroeme_032148(1).xls
+32fda2a HEAD@{15}: commit: Added: resources/Schule/Math @ Knuth/Alle Aufgaben - Analysis_033200.pdf resources/Schule/Math @ Knuth/Alle Aufgaben - Analytische Geometrie_033215.pdf resources/Schule/Math @ Knuth/Alle Aufgaben - Stochastik_033236.pdf resources/Schule/Math @ Knuth/Alle Stichpunkte - Analysis_033240.pdf resources/Schule/Math @ Knuth/Alle Stichpunkte - Analytische Geometrie_033243.pdf resources/Schule/Math @ Knuth/Alle Stichpunkte - Stochastik_033246.pdf resources/Schule/Math @ Knuth/Alle Zusammenfassungen - Analysis_033249.pdf resources/Schule/Math @ Knuth/Alle Zusammenfassungen Analysis_033634.docx resources/Schule/Math @ Knuth/Alle Zusammenfassungen - Analysis-1_033323.pdf resources/Schule/Math @ Knuth/Alle Zusammenfassungen - Analytische Geo_033403.pdf resources/Schule/Math @ Knuth/Alle Zusammenfassungen Analytische Geo_033706.docx resources/Schule/Math @ Knuth/Alle Zusammenfassungen - Analytische Germetrie_033452.pdf resources/Schule/Math @ Knuth/Alle Zusammenfassungen - Stochastik_033617.pdf resources/Schule/Math @ Knuth/Alle Zusammenfassungen Stochastik_033742.docx resources/Schule/Math @ Knuth/Alle Zusammenfassungen - Stochastik-1_033627.pdf resources/Schule/Math @ Knuth/Anwendungsaufgaben Gerade Ebene_033745.pdf resources/Schule/Math @ Knuth/Anwendungsaufgaben Gerade Ebene_043228.pdf resources/Schule/Math @ Knuth/Anwendungsaufgaben Gerade Ebene-1_033748.pdf resources/Schule/Math @ Knuth/Anwendungsaufgaben Gerade Ebene-2_033751.pdf resources/Schule/Physik @ P\303\244tzi/Abiaufgabe_033133.docx
+85d4ab4 HEAD@{16}: commit: Added: resources/Bio/Enes_Ding_da.pdf resources/CSC/CSC Ex 10.pdf resources/CSC/CSC Ex 11.pdf resources/CSC/CSC Ex 12.pdf resources/CSC/CSC Ex 1.pdf resources/CSC/CSC Ex 2.pdf resources/CSC/CSC Ex 3.pdf resources/CSC/CSC Ex 4.pdf resources/CSC/CSC Ex 5.pdf resources/CSC/CSC Ex 6.pdf resources/CSC/CSC Ex 7.pdf resources/CSC/CSC Ex 8.pdf resources/CSC/CSC Ex 9.pdf Renamed: resources/Alle Zusammenfassungen - Analysis-1_033323.pdf -> resources/Math/Alle Zusammenfassungen - Analysis-1_033323.pdf resources/Alle Zusammenfassungen - Analytische Germetrie_033452.pdf -> resources/Math/Alle Zusammenfassungen - Analytische Germetrie_033452.pdf resources/Alle Zusammenfassungen - Stochastik_033617.pdf -> resources/Math/Alle Zusammenfassungen - Stochastik_033617.pdf resources/bcm2711-peripherals.pdf -> resources/broadcom/bcm2711-peripherals.pdf resources/Monopoly-3-1.pdf -> resources/Math/Monopoly-3-1.pdf resources/Stochastik Zusammenfassung.pdf -> resources/Math/Stochastik Zusammenfassung.pdf resources/VS_1.34.pdf -> resources/VS/VS_1.34.pdf resources/Zusammenfassung_und_Lernmaterial_Verteilte_Systeme.pdf -> resources/VS/Zusammenfassung_und_Lernmaterial_Verteilte_Systeme.pdf
+554de27 HEAD@{17}: commit: Added: resources/Alle Zusammenfassungen - Analysis-1_033323.pdf resources/Alle Zusammenfassungen - Analytische Germetrie_033452.pdf resources/Alle Zusammenfassungen - Stochastik_033617.pdf resources/Stochastik Zusammenfassung.pdf resources/Zusammenfassung_und_Lernmaterial_Verteilte_Systeme.pdf
+6c78c8c HEAD@{18}: commit: Added: resources/Monopoly-3-1.pdf resources/VS_1.34.pdf
+b0af41d HEAD@{19}: commit: Upload Thesis
+7a4999e HEAD@{20}: commit: Do stuff
+2dce91a HEAD@{21}: pull --rebase (finish): returning to refs/heads/main
+2dce91a HEAD@{22}: pull --rebase (pick): Update stuffsies ✨
+cfd32aa HEAD@{23}: pull --rebase (start): checkout cfd32aa0b8166548ed2540bfb747a26f8175704f
+e85b5a6 HEAD@{24}: commit: Update stuffsies ✨
+165c327 HEAD@{25}: commit: Update test-runner to new design
+3dd47c8 HEAD@{26}: reset: moving to HEAD
+3dd47c8 HEAD@{27}: commit: Fixup code, small improvements
+122ab06 HEAD@{28}: commit (amend): Shift to generate_string approach
+d27b545 HEAD@{29}: commit (amend): Shift to generate_string approach
+17113af HEAD@{30}: commit: Shift to generate_string approach
+f586c83 HEAD@{31}: commit: Implement big part of new Logging Framework
+a6c17d2 HEAD@{32}: commit: Make num_data_bytes dynamic
+8727af4 HEAD@{33}: commit (amend): Implement Logging Thread Approach (WIP)
+9bdfbb5 HEAD@{34}: commit (amend): Implement Logging Thread Approach (WIP)
+5b8eab0 HEAD@{35}: commit: Implement Logging Thread Approach (WIP)
+217b77a HEAD@{36}: reset: moving to HEAD
+217b77a HEAD@{37}: commit: More cleanup + loggin framework
+aff4a02 HEAD@{38}: commit: Huge Refactor: test-runner
+65494f3 HEAD@{39}: commit: Rework MiniUART::new to create the UIO device itself instead of having a function in lib
+6a2a5c3 HEAD@{40}: commit: Implement Checksum algorithm in python
+c36db24 HEAD@{41}: commit: Implement Logger for handling of where to output what
+8597481 HEAD@{42}: commit: Implement Vec<UARTStats> for Packet instead of always one
+366c28b HEAD@{43}: commit: Add Bitflags
+91feabd HEAD@{44}: pull: Fast-forward
+f96f76f HEAD@{45}: commit: Implement Packet object creation in python test framework
+a2982ef HEAD@{46}: commit (amend): Update Rust Driver to Packets instead of Bytes
+5ee8fff HEAD@{47}: commit (amend): Update Rust Driver to Packets instead of Bytes
+f52ef58 HEAD@{48}: commit (amend): Update Rust Driver to Packets instead of Bytes
+9739034 HEAD@{49}: commit (amend): Update Rust Driver to Packets instead of Bytes
+198bfe2 HEAD@{50}: commit (amend): Update Rust Driver to Packets instead of Bytes
+a8daff2 HEAD@{51}: commit: Update Rust Driver to Packets instead of Bytes
+95b949f HEAD@{52}: commit (amend): Introduce blocks into test setup analysis
+f9093ec HEAD@{53}: commit: Introduce blocks into test setup analysis
+b6c1d69 HEAD@{54}: commit: Make test-runner be able to deploy and get results
+0fc1671 HEAD@{55}: reset: moving to HEAD
+0fc1671 HEAD@{56}: commit: Introduce caching into deploying
+ef91fd1 HEAD@{57}: commit: Introduce test-runner, rework Just to imports instead of modules
+c56cb71 HEAD@{58}: commit: Update written thesis
+d3546e9 HEAD@{59}: commit: Initial Commit
+2e6b245 HEAD@{60}: clone: from github.com:Emily3403/Bachelor-Thesis-New.git
